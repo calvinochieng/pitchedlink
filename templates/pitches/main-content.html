@@ -1,0 +1,1225 @@
+
+
+{% load static %}
+{% load i18n %}
+
+<style>
+  :root {    
+    --border-color: #e6a50d4f;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  /* Base styles */
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 30px;
+      background-color: #ffffff;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) #f0f0f0;
+    }
+
+    @media (min-width: 769px) {
+      .main-content {
+        padding: 0 30px 30px;
+      }
+    }    
+    /* Section headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+
+    .section-link {
+      color: var(--primary-color);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-link i {
+      margin-left: 5px;
+      font-size: 0.8rem;
+    }
+
+    /* Cards and grids */
+
+    /* Card shared styles */
+    .new-pitch-item {
+      background-color: var(--card-bg);
+      border: 1px solid #e2dfdf;
+      transition: all 0.3s ease;
+    }
+
+    .new-pitch-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-hover);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .countdown-badge {
+      background-color: #ff4757;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 2;
+    }
+
+    .card-image {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .new-pitch-item:hover .card-image img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      margin: 0;
+    }
+
+    .card-category {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
+    }
+
+    /* Description styles */
+    .card-description,
+    .new-pitch-desc {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-description {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 15px;
+      -webkit-line-clamp: 2;
+      height: 38px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .card-tag {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-stats {
+      gap: 12px;
+    }
+
+    .card-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .card-link {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--text-light);
+      transition: all 0.2s ease;
+    }
+
+    .card-link:hover {
+      background-color: var(--primary-color);
+      color: #000;
+    }
+
+    /* New pitches section with line separators */
+    .new-pitches-list {
+      margin:0 -30px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+      overflow: hidden;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .new-pitch-item {
+      overflow: hidden;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #c0c0c0;
+      background-color: #fff;
+    }
+    
+    .new-pitch-item:hover {
+      background-color: #f9f9f9;
+      transform: translateX(5px);
+    }
+    
+    .new-pitch-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-right: 15px;
+    }
+    
+    .new-pitch-content {
+      flex: 1;
+    }
+    
+    .new-pitch-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+    
+    .new-pitch-desc {
+      color: #666;
+      font-size: 0.85rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .new-pitch-date {
+      color: var(--primary-color);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-left: auto;
+      padding-left: 15px;
+      white-space: nowrap;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .pagination a, 
+    .pagination span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin: 0 5px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .pagination a {
+      background-color: #fff;
+      color: var(--text-color);
+      border: 1px solid #e0e0e0;
+    }
+
+    .pagination a:hover {
+      background-color: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .pagination .current {
+      background-color: var(--primary-color);
+      color: #000;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* New Pitches Grid */
+    .pitches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .pitch-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid #eee;
+    }
+
+    .pitch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .pitch-card-inner {
+      padding: 20px;
+    }
+
+    /* Pitch Header */
+    .pitch-header {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .pitch-icon-wrapper {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .pitch-icon {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+    }
+
+    .pitch-basic-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .pitch-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      color: #2d3436;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pitch-meta {
+      display: flex;
+      font-size: 0.8rem;
+      color: #636e72;
+    }
+    .pitch-category {
+      background: #f0f0f0;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .pitch-category,
+    .pitch-date,
+    .pitch-user {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      width: fit-content;
+    }
+
+    .pitch-category i,
+    .pitch-date i,
+    .pitch-user i {
+      margin-right: 4px;
+      font-size: 0.7rem;
+      color: #74b9ff;
+    }
+
+    .pitch-user {
+      color: #636e72;
+    }
+
+    .pitch-user i {
+      color: #00b894;
+    }
+
+    /* User Info Styles */
+    .pitch-user-info {
+      font-size: 0.8rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+    }
+
+    .by-text {
+      color: #888;
+    }
+
+    .user-link {
+      color: #2c3e50;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      transition: color 0.2s ease;
+    }
+
+    .user-link:hover {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+
+    .verified-badge {
+      color: #1DA1F2;
+      font-size: 0.7em;
+      margin-left: 2px;
+    }
+
+    .user-handle {
+      color: #888;
+      margin-left: 2px;
+    }
+
+    /* Pitch Description */
+    .pitch-description {
+      color: #636e72;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Pitch Stats */
+    .pitch-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 12px 0;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      color: #636e72;
+      font-size: 0.85rem;
+    }
+
+    .stat i {
+      margin-right: 6px;
+      color: #74b9ff;
+    }
+
+    /* Pitch Actions */
+    .pitch-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+    }
+
+    .btn i {
+      margin-right: 6px;
+    }
+
+    .btn-primary {
+      background: #0984e3;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0778cd;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: white;
+      color: #2d3436;
+      border: 1px solid #dfe6e9;
+    }
+
+    .btn-outline:hover {
+      background: #f8f9fa;
+      transform: translateY(-1px);
+    }
+
+    .btn-twitter {
+      background: #1da1f2;
+      color: white;
+    }
+
+    .btn-twitter:hover {
+      background: #1a8cd8;
+      transform: translateY(-1px);
+    }
+
+    /* Empty State */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: #636e72;
+    }
+
+    .empty-state i {
+      font-size: 2.5rem;
+      color: #b2bec3;
+      margin-bottom: 16px;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    /* Pitches List Layout */
+
+    .pitch-item {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid  #e6a50d4f;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .pitch-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+      background-color: #f8f9fa;
+      border-color: #FFD700;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.15);
+    }
+
+    .pitch-item-inner {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .pitch-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .pitch-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .pitch-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .pitch-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .pitch-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #2d3436;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pitch-user {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: #636e72;
+    }
+
+    .pitch-description {
+      color: #636e72;
+      font-size: 0.9rem;
+      margin: 4px 0 8px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pitch-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: #636e72;
+    }
+
+    .pitch-category {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #636e72;
+    }
+
+    .pitch-category i {
+      color: #74b9ff;
+      font-size: 0.7rem;
+    }
+
+    .pitch-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: #636e72;
+    }
+
+    .stat i {
+      color: #b2bec3;
+      font-size: 0.8rem;
+    }
+
+    .pitch-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: #636e72;
+      background: #f8f9fa;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .pitch-link:hover {
+      background: #f1f3f5;
+      color: #0984e3;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .pitch-item-inner {
+        padding: 12px;
+        gap: 12px;
+      }
+      
+      .pitch-icon-wrapper {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .pitch-name {
+        font-size: 0.95rem;
+      }
+      
+      .pitch-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .pitch-stats {
+        width: 100%;
+      }
+    }
+</style>
+<!-- CSS for the loading spinner -->
+<style>
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+  
+  .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+  }
+</style>
+
+<div class="main-content">    
+    <!-- Featured Hero Section -->
+
+    {% include "./featured.html" %}
+
+    
+    {% if is_mobile %}
+      {% include "./mobile-leaderboard.html" %}
+    {% endif %}
+      <!-- New Pitches Section -->
+    <div class="section-header" id="new-pitches">
+      <h2 class="section-title">
+        <i class="fa-solid fa-bolt"></i>
+        New Pitches
+      </h2>
+      <a href="#" class="section-link">
+        View All
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="pitch-list columns is-multiline">
+      {% if new_pitches %}
+        {% for pitch in new_pitches %}
+        
+        <div class="column is-6 fade-in" style="position: relative;">
+          <button 
+            style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 1;"
+            class="button is-link" onclick="window.location.href='{{ pitch.url }}'">
+            <i class="fas fa-external-link-alt"></i>
+          </button>
+          <a href="{% url 'detail' slug=pitch.slug %}">
+              <div class="new-pitch-item card has-background-white">
+                  <img src="{{ pitch.banner_url }}" 
+                    onerror="this.src='/static/preview.jpg';" 
+                    alt="{{ pitch.title }}"
+                    style="width: 100%; height: 150px; object-fit: cover;">
+                  <div class="card-content">
+                      <div class="media mb-4">
+                          <div class="media-content">
+                            <p class="title is-6 mb-0 has-text-black-ter">{{ pitch.title }} </p>
+                            <p class="subtitle is-6 ">by <span class="has-text-black-ter">{{  pitch.pitch_data.0.user.handle }}</span> <span class="tag is-6 is-light">{{ pitch.category.name }}</span></p>
+                          
+                          </div>
+                      </div>  
+                      <div class="level is-mobile">
+                          <div class="level-left">
+                          <div class="level-item">
+                              <span class="icon has-text-warning">
+                              <i class="fas fa-bullhorn"></i>
+                              </span>
+                              <span>{{ pitch.mention_count }}</span>
+                          </div>
+                          </div>
+                          <div class="level-right">
+                          <div class="tags">
+                              <span class="">
+                                <span class="icon">
+                                    <i class="fas fa-gem has-text-danger"></i>
+                                </span>
+                              <span>Rank #{{ pitch.rank }}</span>
+                              </span>
+                              <span class="">
+                              <span class="icon">
+                                  <i class="fas fa-hands-clapping has-text-success"></i>
+                              </span>
+                              <span>{{ pitch.clap }} Claps</span>
+                              </span>
+                          </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </a>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>No new pitches found</p>
+        </div>
+      {% endif %}
+    </div>
+    
+    <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <style>
+      /* New Pitches List Layout */
+      .pitches-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      /* New Pitch Card */
+      .new-pitch-card {
+        background-color: #fff;
+        border-radius: 12px;
+        border: 1px solid #eee;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      
+      .new-pitch-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Card Header */
+      .new-pitch-header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #f5f5f5;
+      }
+      
+      .new-pitch-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-right: 15px;
+        border: 1px solid #f0f0f0;
+        background-color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      .new-pitch-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      
+      .new-pitch-card:hover .new-pitch-icon img {
+        transform: scale(1.1);
+      }
+      
+      .new-pitch-info {
+        flex: 1;
+        overflow: hidden;
+      }
+      
+      .new-pitch-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      .new-pitch-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      
+      .new-pitch-title a:hover {
+        color: var(--primary-color);
+      }
+      
+      .new-pitch-desc {
+        color: #666;
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+        max-height: 40px;
+      }
+      
+      /* Stats Section */
+      .new-pitch-stats {
+        display: flex;
+        padding: 12px 20px;
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .pitch-stat {
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+        font-size: 0.85rem;
+        color: #666;
+      }
+      
+      .pitch-stat i {
+        margin-right: 6px;
+        font-size: 0.85rem;
+      }
+      
+      .pitch-stat:first-child i {
+        color: #4CAF50;
+      }
+      
+      .pitch-stat:nth-child(2) i {
+        color: var(--primary-color);
+      }
+      
+      /* Actions Section */
+      .new-pitch-actions {
+        display: flex;
+        padding: 12px 20px;
+        margin-top: auto;
+        justify-content: space-between;
+        border-top: 1px solid #f5f5f5;
+        background-color: #f9f9f9;
+      }
+      
+      .pitch-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+      
+      .pitch-action i,
+      .pitch-action span:first-child {
+        margin-right: 6px;
+      }
+      
+      .source-action {
+        background-color: #f0f0f0;
+        color: #555;
+      }
+      
+      .source-action:hover {
+        background-color: #e5e5e5;
+      }
+      
+      .visit-action {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+      
+      .visit-action:hover {
+        background-color: #f0f0f0;
+        color: var(--primary-color);
+        border: 1px solid #e0e0e0;
+      }
+      
+      .details-action {
+        background-color: var(--primary-color);
+        color: #000;
+        font-weight: 500;
+      }
+      
+      .details-action:hover {
+        background-color: #ffd700;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 220, 0, 0.3);
+      }
+      
+      /* Empty State */
+      .empty-pitches {
+        grid-column: 1 / -1;
+      }
+      
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .new-pitches-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .new-pitch-actions {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        
+        .pitch-action {
+          flex: 1;
+          min-width: 100px;
+        }
+      }
+    </style>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      let isLoading = false;
+      let currentPage = 1;
+      let hasMore = true;
+      const container = document.querySelector('.pitch-list');
+      const loadingIndicator = document.getElementById('loading-indicator');
+      let observer = null;
+      let sentinel = null;
+  
+      console.log('Advanced Intersection Observer infinite scroll initialized');
+  
+      if (!container) {
+          console.error('Pitch-list container not found');
+          return;
+      }
+  
+      const fallbackBannerUrl = '/static/preview.jpg';
+  
+      // Create a sentinel element to observe
+      function createSentinel() {
+          if (sentinel) {
+              sentinel.remove();
+          }
+          sentinel = document.createElement('div');
+          sentinel.className = 'scroll-sentinel';
+          sentinel.style.cssText = 'height: 1px; margin-top: -1px; opacity: 0; pointer-events: none;';
+          container.appendChild(sentinel);
+          return sentinel;
+      }
+  
+      // Function to observe the sentinel
+      function observeSentinel() {
+          if (observer) {
+              observer.disconnect();
+          }
+          const sentinelElement = createSentinel();
+          observer = new IntersectionObserver(function(entries) {
+              entries.forEach(entry => {
+                  if (entry.isIntersecting && !isLoading && hasMore) {
+                      loadMorePitches();
+                  }
+              });
+          }, {
+              rootMargin: '200px',
+              threshold: 0
+          });
+          observer.observe(sentinelElement);
+      }
+  
+      // Add HTML escaping function
+      function escapeHtml(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+      }
+  
+      // Function to load more pitches
+      async function loadMorePitches() {
+          if (isLoading || !hasMore) return;
+          isLoading = true;
+          currentPage++;
+          if (loadingIndicator) loadingIndicator.style.display = 'block';
+          try {
+              const response = await fetch(`/pitches/?page=${currentPage}&format=json`, {
+                  headers: {
+                      'X-Requested-With': 'XMLHttpRequest',
+                      'Accept': 'application/json'
+                  }
+              });
+              if (!response.ok) throw new Error('Network response was not ok');
+              const data = await response.json();
+              console.log('Response data:', data);
+              if (data.success && data.pitches.length > 0) {
+                  if (sentinel) sentinel.remove();
+                  // Append each new pitch as a column
+                  data.pitches.forEach(pitch => {
+                      const pitchElement = createPitchColumn(pitch);
+                      container.appendChild(pitchElement);
+                  });
+                  hasMore = data.pagination.has_next;
+                  if (hasMore) observeSentinel();
+              } else {
+                  hasMore = false;
+                  if (observer) observer.disconnect();
+                  if (sentinel) sentinel.remove();
+              }
+          } catch (error) {
+              showErrorMessage('Failed to load more pitches. Please try again.');
+          } finally {
+              isLoading = false;
+              if (loadingIndicator) loadingIndicator.style.display = 'none';
+          }
+      }
+  
+      function showErrorMessage(message) {
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'error-message';
+          errorDiv.textContent = message;
+          errorDiv.style.cssText = 'color: red; padding: 10px; text-align: center;';
+          container.appendChild(errorDiv);
+          setTimeout(() => {
+              if (errorDiv.parentNode) errorDiv.parentNode.removeChild(errorDiv);
+          }, 5000);
+      }
+  
+      // Create a pitch card column in the current UI style
+      function createPitchColumn(pitch) {
+          const col = document.createElement('div');
+          col.className = 'column is-6 fade-in';
+          col.style.position = 'relative';
+          const bannerUrl = pitch.banner_url || fallbackBannerUrl;
+          const handle = pitch.handle || '';
+          const category = pitch.category || 'Startup';
+          const rank = pitch.rank || '';
+          const clap = pitch.clap || 0;
+          const mention_count = pitch.mention_count || 0;
+          const title = escapeHtml(pitch.title || pitch.name || '');
+          const pitchUrl = pitch.url ? escapeHtml(pitch.url) : '#';
+          col.innerHTML = `
+            <button 
+              style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 1;"
+              class="button is-link" onclick="window.open('${pitchUrl}', '_blank')">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+            <a href="/p/${pitch.slug}/">
+                <div class="new-pitch-item card has-background-white">
+                    <img src="${bannerUrl}" 
+                      onerror="this.src='${fallbackBannerUrl}';" 
+                      alt="${title}"
+                      style="width: 100%; height: 150px; object-fit: cover;">
+                    <div class="card-content">
+                        <div class="media mb-4">
+                            <div class="media-content">
+                              <p class="title is-6 mb-0 has-text-black-ter">${title}</p>
+                              <p class="subtitle is-6 ">by <span class="has-text-black-ter">${handle}</span> <span class="tag is-6 is-light">${category}</span></p>
+                            </div>
+                        </div>  
+                        <div class="level is-mobile">
+                            <div class="level-left">
+                            <div class="level-item">
+                                <span class="icon has-text-warning">
+                                <i class="fas fa-bullhorn"></i>
+                                </span>
+                                <span>${mention_count}</span>
+                            </div>
+                            </div>
+                            <div class="level-right">
+                            <div class="tags">
+                                <span class="">
+                                  <span class="icon">
+                                      <i class="fas fa-gem has-text-danger"></i>
+                                  </span>
+                                <span>Rank #${rank}</span>
+                                </span>
+                                <span class="">
+                                <span class="icon">
+                                    <i class="fas fa-hands-clapping has-text-success"></i>
+                                </span>
+                                <span>${clap} Claps</span>
+                                </span>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+          `;
+          return col;
+      }
+  
+      
+      // Initialize observer on load if there are initial items
+      setTimeout(function() {
+          const pitchItems = container.querySelectorAll('.column.is-6.fade-in');
+          if (pitchItems.length > 0) {
+              observeSentinel();
+          }
+      }, 100);
+  });
+  </script>
+
+
+
+
+
+

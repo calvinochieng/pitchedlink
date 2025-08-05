@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing | {% endblock title %}
+
+{% block description %}Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!{% endblock description %}
+{% load static %}
+
+{% block meta %}
+<!-- meta seo -->
+    <meta property="og:title" content="Pricing | Microsaaslink">
+    <meta property="og:description" content="Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!">
+    <meta property="og:image" content="{% static 'app/images/microsaaslink.png' %}">
+    
+    <meta name="twitter:title" content="Pricing | Microsaaslink">
+    <meta name="twitter:description" content="Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!">
+    <meta name="twitter:image" content="{% static 'app/images/microsaaslink.png' %}">
+    
+{% endblock meta %}
+
+
+{% block custom_styles %}
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+      --text-gradient: linear-gradient(90deg, #6e6e6e 0%, #718fb9 100%);
+    }
+
+    .navbar {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.8) !important;
+      position: fixed;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .navbar-item {
+      font-weight: 500;
+      color: #1E293B;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--primary-gradient);
+      opacity: 0.85;
+    }
+
+    .hero-body {
+      padding: 12rem 1.5rem 6rem !important;
+      position: relative;
+    }
+
+    .title {
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .hero .title {
+      font-size: 3.5rem;
+      background: linear-gradient(to right, #fff, #f0f0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2rem;
+    }
+
+    .feature-card {
+      border-radius: 1rem;
+      padding: 2rem;
+      height: 100%;
+      transition: transform 0.2s ease;
+      border: 1px solid #e2e8f038;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta-button {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      border: none;
+      transition: transform 0.2s ease;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+      color: white;
+    }
+
+    .testimonial-card {
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      height: 100%;
+    }
+
+    .section {
+      padding: 6rem 1.5rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      background: var(--text-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .pricing-amount .title {
+      color: #4F46E5;
+    }
+
+    .feature-card ul {
+      list-style: none !important;
+      margin-left: 0 !important;
+    }
+
+    .feature-card ul li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .feature-card ul li .icon {
+      margin-right: 0.5rem;
+    }
+
+    .pricing-amount {
+      position: relative;
+    }
+
+    .pricing-amount .title {
+      margin-bottom: 0 !important;
+    }
+
+    .pricing-amount .subtitle {
+      opacity: 0.8;
+    }
+
+    .promotional-banner {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .yearly-savings {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    
+    .early-bird {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      background: #ef4444;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      transform: rotate(15deg);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .countdown {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+    
+    {% comment %} footer, nav{ display: none !important; } {% endcomment %}
+  </style>
+{% endblock custom_styles %}
+
+{% block content %}
+
+     <!-- Navigation Bar -->
+  <div class="navbar is-index-hidden is-transparent">
+   <div class="container">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="{% url 'pricing'%}">Pricing</a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-link is-rounded is-outlined" href="{% url 'account_login' %}">
+                <strong>Login</strong>
+              </a>
+              <a class="button is-link is-rounded" href="{% url 'account_signup' %}">
+                <strong>Signup</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+  </div>
+<!-- Hero Section -->
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="promotional-banner">
+      <h2 class="is-size-4 mb-2">🎉 Limited Time Offer: Completely Free to Use! 🎉</h2>
+      <p class="is-size-6">No subscription needed during our launch period. Try all premium features at no cost.</p>
+      <div class="countdown">Early Bird Pricing Ends In: 7 Days</div>
+    </div>
+    
+    <h2 class="section-title">Simple, Transparent Pricing</h2>
+    <p class="has-text-centered is-size-5 mb-6">Start with our 30-day free trial, then choose what works for you</p>
+
+    <div class="columns is-centered">
+      <!-- Free Trial -->
+      <div class="column is-5">
+        <div class="feature-card has-text-centered">
+          <h3 class="title is-3 mb-2">Free Trial</h3>
+          <div class="pricing-amount mb-4">
+            <p class="title is-1">$0</p>
+            <p class="subtitle is-5 has-text-primary">For 30 Days</p>
+          </div>
+          <div class="content mb-5">
+            <ul class="has-text-left">
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Full access to all features</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> 17-30 searches per analysis</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Multi-platform insights</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Technical feasibility reports</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Competitor analysis</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> No credit card required</li>
+            </ul>
+          </div>
+          <a href="{% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Start Free Trial</a>
+        </div>
+      </div>
+
+      <!-- Premium Subscription -->
+      <div class="column is-5">
+        <div class="feature-card has-text-centered" style="border: 2px solid #4F46E5; position: relative;">
+          <div class="early-bird">Early Bird!</div>
+          <h3 class="title is-3 mb-2">Premium</h3>
+          <div class="pricing-amount mb-4">
+            <p class="title is-1">$14.99</p>
+            <p class="subtitle is-5 has-text-primary">per month</p>
+            <p class="tag is-warning is-large mt-2 mb-2">Early Bird Price: $9.99/mo</p>
+            <div class="yearly-savings">Save 16% with annual billing</div>
+          </div>
+          <div class="content mb-5">
+            <ul class="has-text-left">
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Everything in Free Trial</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Unlimited analyses</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Priority processing</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Extended data retention</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Trend forecasting</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Email reports & alerts</li>
+            </ul>
+          </div>
+          <div class="buttons are-medium is-centered">
+            <a href="{% url 'dashboard' %}" class="button is-primary is-rounded">Subscribe Monthly</a>
+            <a href="{% url 'dashboard' %}" class="button is-link is-rounded">Subscribe Yearly</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div class="mt-6 pt-6">
+      <h3 class="title is-4 has-text-centered mb-5">Frequently Asked Questions</h3>
+      <div class="columns is-multiline is-centered">
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">What's included in the free trial?</h4>
+            <p>You get full access to all premium features for 30 days. No credit card required and no obligation to continue.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">How does the early bird pricing work?</h4>
+            <p>Sign up during our launch period to lock in the special rate of $9.99/month for as long as you maintain your subscription.</p>
+          </div>
+        </div>
+
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">Can I cancel anytime?</h4>
+            <p>Yes! There are no long-term contracts. You can cancel your subscription at any time without penalty.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">What happens after my free trial?</h4>
+            <p>After 30 days, you'll be prompted to choose a subscription plan. No automatic charges - we'll ask for your permission first.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">How does yearly billing work?</h4>
+            <p>With yearly billing, you pay for 10 months and get 2 months free - that's a 16% savings compared to monthly billing.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="content">
+            <h4 class="is-size-5 mb-3">Will my price increase later?</h4>
+            <p>Early bird subscribers lock in their special rate for as long as they maintain their subscription, even after the promotion ends.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}{% endblock scripts %}

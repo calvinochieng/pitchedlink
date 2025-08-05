@@ -1,0 +1,914 @@
+{% extends "pitches/base.html" %}
+{% load static %}
+
+{% block title %}{{ category_name }} Pitches | PitchedLink{% endblock %}
+
+{% block description %}Browse the latest {{ category_name }} startup pitches on PitchedLink. Discover innovative products and services in the {{ category_name }} category.{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Browse the latest {{ category_name }} startup pitches on PitchedLink. Discover innovative products and services in the {{ category_name }} category.">
+    <meta property="og:title" content="{{ category_name }} Pitches | PitchedLink">
+    <meta property="og:description" content="Browse the latest {{ category_name }} startup pitches on PitchedLink. Discover innovative products and services in the {{ category_name }} category.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ category_name }} Pitches | PitchedLink">
+    <meta name="twitter:description" content="Browse the latest {{ category_name }} startup pitches on PitchedLink.">
+{% endblock %}
+
+{% block custom_styles %}
+<style>
+  :root {
+    /* Brand Colors */
+    --primary: #2563eb;
+    --primary-color: #FFB70F;
+    --secondary-color: #0088cc;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    
+    /* Text Colors */
+    --text-primary: #0f172a;
+    --text-light:rgb(71, 70, 70);
+    --text-muted: rgba(0, 0, 0, 0.6);
+    --text-color: #333333;
+    
+    /* Background Colors */
+    --background-color: #ffffff;
+    --card-bg: #ffffff;
+    --bg-primary: #ffffff !important;
+    --navbar-bg: rgba(255, 255, 255, 0.95);
+    
+    /* Border Colors */
+    --border-light: rgba(0, 0, 0, 0.1);
+    --border-hover: rgba(255, 183, 15, 0.5);
+    --navbar-border: rgba(255, 183, 15, 0.3);
+    
+    /* Status Colors */
+    --launched-badge: #28a745;
+    --featured-badge: #e63946;
+    
+    /* Shadows */
+    --navbar-shadow: 0 0 20px rgba(255, 183, 15, 0.4),
+                    0 0 40px rgba(255, 183, 15, 0.15),
+                    0 8px 32px rgba(0, 0, 0, 0.2);
+    --navbar-hover-shadow: 0 0 30px rgba(255, 183, 15, 0.6),
+                        0 0 60px rgba(255, 183, 15, 0.25),
+                        0 15px 50px rgba(0, 0, 0, 0.25);
+    
+    /* Aliases for existing variables */
+    
+    --primary-hover: #1d4ed8;
+    --primary: var(--primary-color);
+    --primary-dark: #e6a500;
+    --primary-light: #ffc952;
+    --bg-light: var(--card-bg);
+    --bg-lighter: var(--background-color);
+    --text-dark: var(--text-color);
+    --border-color: var(--border-light);
+    --success: var(--success-color);
+    --warning: var(--warning-color);
+    --error: #dc3545;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* Common navbar styles */
+    .navbar {
+        background-color: var(--navbar-bg) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+  .navbar-brand .navbar-item span {
+      color: var(--primary-color) !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+  }
+
+  .navbar-brand .navbar-item span>span {
+      color: var(--text-light) !important;
+      opacity: 0.8;
+  }
+
+  .navbar-burger {
+      color: var(--text-light) !important;
+  }
+
+  .navbar-menu {
+      background-color: transparent !important;
+  }
+
+  @media screen and (max-width: 1023px) {
+      
+      .navbar-menu .navbar-item,
+      .navbar-menu .navbar-link {
+          color: #333333 !important;
+          padding: 0.75rem 1.5rem !important;
+      }
+      
+      .navbar-menu .navbar-item:hover,
+      .navbar-menu .navbar-link:hover {
+          background-color: rgba(255, 183, 15, 0.1) !important;
+          color: var(--primary-color) !important;
+      }
+  }
+
+  .navbar-item {
+      color: var(--text-color) !important;
+      transition: all 0.2s ease;
+  }
+
+  .navbar-item:hover {
+      background-color: rgba(255, 215, 0, 0.15) !important;
+      color: var(--primary-color) !important;
+      transform: translateY(-1px);
+      transition: all 0.2s ease-in-out;
+  }
+
+  .navbar-item.is-active {
+      background-color: rgba(255, 183, 15, 0.15) !important;
+      color: var(--primary-color) !important;
+  }
+
+  .navbar-item i {
+      margin-right: 8px;
+  }
+
+  .navbar-dropdown {
+      background-color: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      {% comment %} box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; {% endcomment %}
+      padding: 0.5rem 0 !important;
+  }
+
+  .navbar-dropdown .navbar-item:not(.is-active,.is-selected) {
+      color: #333333 !important;
+      background: transparent !important;
+      padding: 0.5rem 1.5rem !important;
+      font-size: 0.95rem !important;
+      transition: all 0.2s ease !important;
+      white-space: nowrap !important;
+  }
+
+  .navbar-dropdown .navbar-item:not(.is-active,.is-selected):hover {
+      background-color: rgba(255, 183, 15, 0.1) !important;
+      color: var(--primary-color) !important;
+      transform: translateX(4px) !important;
+  }
+  
+  /* Ensure active/selected states are also styled */
+  .navbar-dropdown .navbar-item.is-active,
+  .navbar-dropdown .navbar-item.is-selected {
+      background-color: rgba(255, 183, 15, 0.15) !important;
+      color: var(--primary-color) !important;
+  }
+  
+  .navbar-link:not(.is-arrowless)::after {
+      border-color: #333333 !important;
+      transition: border-color 0.2s ease !important;
+  }
+  
+  .navbar-link:hover:not(.is-arrowless)::after,
+  .navbar-link:hover::after {
+      border-color: var(--primary-color) !important;
+  }
+
+  /* Custom button styling */
+  .button.is-warning.is-rounded {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #0f0f0f;
+      font-weight: 600;
+  }
+
+  .button.is-warning.is-rounded:hover {
+      background-color: #e6a50d;
+      border-color: #e6a50d;
+  }
+
+ 
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* Header Section */
+  .hero {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .title {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    box-shadow: var(--shadow-lg);
+    flex-shrink: 0;
+  }
+
+  .hero-info h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .hero-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: #d3d3d357;
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .meta-icon {
+    font-size: 1rem;
+    color: var(--primary);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-secondary {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+  }
+
+  /* Stats Section */
+  .stats {
+    padding: 2rem 0;
+    background: var(--bg-primary);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Main Content */
+  .main-content {
+    padding: 2.5rem 0;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .content-primary {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+  }
+
+  .content-secondary {
+    display: none; /* Hide the secondary content area */
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 2rem;
+  }
+
+  .tab {
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+  }
+
+  .tab:hover {
+    color: var(--primary);
+  }
+
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Markdown Content */
+  .markdown-content {
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+  .markdown-content strong {
+    color: var(--text-primary);
+  }
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3 {
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .markdown-content h1 { font-size: 1.875rem; }
+  .markdown-content h2 { font-size: 1.5rem; }
+  .markdown-content h3 { font-size: 1.25rem; }
+
+  .markdown-content p {
+    margin-bottom: 1.5rem;
+  }
+  .markdown-content p a > strong{
+    color: var(--bulma-link-text);
+    cursor: pointer;
+  }
+  .markdown-content ul,
+  .markdown-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .markdown-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Tweet Card */
+  .tweet-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius);
+    padding: 1rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tweet-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .tweet-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+  }
+
+  .tweet-user {
+    flex: 1;
+  }
+
+  .tweet-name {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .tweet-handle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .tweet-content {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: var(--text-light);
+  }
+
+  .tweet-actions {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Sidebar Cards */
+  .sidebar-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .sidebar-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+
+  .sidebar-list {
+    list-style: none;
+  }
+
+  .sidebar-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .sidebar-list li:last-child {
+    border-bottom: none;
+  }
+
+  .sidebar-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: var(--bg-tertiary);
+  }
+
+  .sidebar-info {
+    flex: 1;
+  }
+
+  .sidebar-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  .sidebar-meta {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  /* Related Pitches */
+  .related-section {
+    padding: 3rem 0;
+    background: var(--bg-primary);
+  }
+
+  .related-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .related-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .related-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .related-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: var(--bg-tertiary);
+  }
+
+  .related-body {
+    padding: 1.25rem;
+  }
+
+  .related-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .related-meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .hero-info h1 {
+      font-size: 2rem;
+    }
+
+    .hero-actions {
+      width: 100%;
+    }
+
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding: 2rem 0;
+    }
+
+    .hero-info h1 {
+      font-size: 1.75rem;
+    }
+
+    .hero-meta {
+      gap: 0.75rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tabs {
+      flex-direction: column;
+    }
+
+    .tab {
+      text-align: center;
+    }
+  }
+
+  /* Clap Animation */
+  @keyframes clap {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .clap-animation {
+    animation: clap 0.3s ease;
+  }
+</style>
+{% endblock custom_styles %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="category-header mb-6">            
+            <div class="columns mb-5">
+                <div class="column">
+                    <h1 class="title is-2 has-text-weight-bold">{{ category_name }}</h1>
+                    <p class="subtitle is-5 has-text-grey">Discover the latest {{ category_name|lower }} startups and products</p>
+                </div>
+            </div>
+        </div>
+
+        {% if pitches %}
+        <div class="pitches-grid">
+            {% for pitch in pitches %}
+            <div class="pitch-card">
+                <a href="{% url 'detail' slug=pitch.slug %}" class="pitch-card-link">
+                    <div class="pitch-image-container">
+                        <img src="{{ pitch.banner_url|default:'/static/preview.jpg' }}" 
+                             alt="{{ pitch.title }}" 
+                             class="pitch-image"
+                             onerror="this.onerror=null; this.src='{% static 'preview.jpg' %}'">
+                    </div>
+                    <div class="pitch-content">
+                        <h3 class="pitch-title">
+                            {{ pitch.title }}
+                        </h3>
+                        <div class="pitch-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-bullhorn"></i>
+                                {{ pitch.mention_count|default:0 }} Mentions
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-gem has-text-danger"></i>
+                                {{ pitch.rank|default:0 }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-hands-clapping has-text-success"></i>
+                                {{ pitch.clap|default:0 }} Claps
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="column is-12">
+            <div class="notification is-light">
+                <p>No pitches found in the {{ category_name }} category yet.</p>
+                <p class="mt-2">
+                    <a href="{% url 'submit_pitch' %}" class="button is-primary is-small">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Be the first to pitch a {{ category_name|lower }} startup</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if is_paginated %}
+        <nav class="pagination is-centered mt-6" role="navigation" aria-label="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="pagination-previous">Previous</a>
+            {% else %}
+                <a class="pagination-previous" disabled>Previous</a>
+            {% endif %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="pagination-next">Next</a>
+            {% else %}
+                <a class="pagination-next" disabled>Next</a>
+            {% endif %}
+            
+            <ul class="pagination-list">
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li><a class="pagination-link is-current" aria-label="Page {{ num }}" aria-current="page">{{ num }}</a></li>
+                    {% else %}
+                        <li><a href="?page={{ num }}" class="pagination-link" aria-label="Goto page {{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .category-header {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+    
+    .pitches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .pitch-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-light);
+    }
+    
+    .pitch-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .pitch-card-link {
+        text-decoration: none;
+        display: block;
+        height: 100%;
+    }
+    
+    .pitch-image-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        overflow: hidden;
+        background: var(--bg-tertiary);
+    }
+    
+    .pitch-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .pitch-card:hover .pitch-image {
+        transform: scale(1.05);
+    }
+    
+    .pitch-content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 56.25%);
+    }
+    
+    .pitch-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+        line-height: 1.4;
+    }
+    
+    .pitch-description {
+        color: var(--text-light);
+        margin-bottom: 1.25rem;
+        flex-grow: 1;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+    
+    .pitch-meta {
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-light);
+    }
+    
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .meta-item i {
+        color: var(--primary-color);
+    }
+    
+    @media (max-width: 768px) {
+        .pitches-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .pitch-content {
+            padding: 1.25rem;
+        }
+        
+        .pitch-title {
+            font-size: 1.1rem;
+        }
+        
+        .pitch-description {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}

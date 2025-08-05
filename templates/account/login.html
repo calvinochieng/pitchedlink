@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+
+{% block title %}Login{% endblock title %}
+
+{% block description %}Login to access advanced product analysis features{% endblock description %}
+
+{% load static %}
+
+{% block custom_styles %}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 2rem auto;
+    }
+    .social-login-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+    footer, nav{ display: none !important; }
+</style>
+{% endblock custom_styles %}
+
+
+{% load socialaccount %}
+
+{% block content %}
+<section class="section is-flex is-fullheight is-justify-content-center is-align-items-center">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-4">
+                <div class="box">
+                    <h1 class="title has-text-centered">{% trans "Sign In" %}</h1>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="notification is-{{ message.tags }}">
+                                {{ message }}
+                                <button class="delete"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form class="is-flex mb-4" method="post" action="{% provider_login_url 'google' %}?next=/dashboard/"> {%csrf_token%}
+                        <button type="submit" class="button is-link is-fullwidth is-medium">
+                          <span class="icon">
+                            <i class="fa fa-brands fa-google has-text-white"></i> 
+                          </span> 
+                          <span class="pl-4">Sign In with Google</span>                       
+                        </button>
+                    </form> 
+                    
+                    <div class="is-divider" data-content="OR"></div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="notification is-danger">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="field">
+                            <label class="label">Email</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="email" name="login" placeholder="Email address" autocomplete="email" maxlength="320" required id="id_login">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="password" name="password" placeholder="Password">
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            </div>
+                        </div>
+                        {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-primary is-outlined is-fullwidth">
+                                    <span class="icon">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                    </span>
+                                    <span>Signin</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="has-text-centered mt-4">
+                        <a href="{% url 'account_signup' %}">Don't have an account? Sign up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Optional: Add client-side form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const email = document.querySelector('input[name="email"]');
+        const password = document.querySelector('input[name="password"]');
+        
+        if (!email.value || !password.value) {
+            e.preventDefault();
+            alert('Please fill in all fields');
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Functions to handle notification deletion
+        const deleteButtons = document.querySelectorAll('.notification .delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                button.parentElement.remove();
+            });
+        });
+
+        // Auto-hide notifications after 5 seconds
+        const notifications = document.querySelectorAll('.notification');
+        notifications.forEach(notification => {
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        });
+    });
+</script>
+{% endblock scripts %}
+
+

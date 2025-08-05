@@ -1,0 +1,2505 @@
+{% block custom_styles %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-gradient::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: linear-gradient(180deg, rgba(99, 102, 241, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    }
+
+    .hero-input {
+        border-radius: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        color: white !important;
+        padding: 1.5rem 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hero-input::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .hero-input:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .hero-input:focus {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        border-color: white;
+    }
+
+    .cta-button {
+        border-radius: 50px;
+        padding: 1.25rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: white;
+        color: #6366f1 !important;
+        border: 2px solid transparent;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .twitter-embed-wrapper {
+        border-radius: 20px;
+        overflow: hidden;
+        transform: perspective(1000px) rotateY(-8deg) rotateX(3deg);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transition: transform 0.3s ease;
+        background: white;
+    }
+
+    .twitter-embed-wrapper:hover {
+        transform: perspective(1000px) rotateY(0) rotateX(0);
+    }
+
+    @media (max-width: 768px) {
+        .twitter-embed-wrapper {
+            margin-top: 3rem;
+            transform: none;
+        }
+    }
+</style>
+{% endblock %}
+
+<section class="hero is-medium hero-gradient">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-vcentered">
+                <!-- Left Column -->
+                <div class="column is-6">
+                    <h1 class="title is-1 has-text-white mb-5">
+                        Get Your SaaS Discovered: 
+                        <span class="has-text-weight-bold">AI-Powered Ranking</span>
+                    </h1>
+                    <h2 class="subtitle is-4 has-text-white-bis has-text-weight-light mt-3 mb-5">
+                        Automatically track and rank your product by real social engagement. 
+                        <br>Claim your pitch and reach the audience beyond your social media pitches.
+                    </h2>
+                    
+                    <!-- Claim Pitch Form -->
+                    <form method="post" action="{% url 'claim_pitch' %}">
+                        {% csrf_token %}
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input 
+                                    class="input is-large hero-input" 
+                                    type="url" 
+                                    name="saas_link" 
+                                    placeholder="Enter your SaaS link" 
+                                    required
+                                >
+                            </div>
+                            <div class="control">
+                                <button 
+                                    type="submit" 
+                                    class="button is-large cta-button"
+                                >
+                                    <strong>Claim Your Pitch →</strong>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column -->
+                <div class="column is-6">
+                    <div class="twitter-embed-wrapper pl-5">
+                        <blockquote class="twitter-tweet" data-theme="dark">
+                            <p lang="en" dir="ltr">Want more eyes on your startup? 👀 <br><br>Drop your pitch &amp; URL 👇 <a href="https://t.co/CmySfrogjL">pic.twitter.com/CmySfrogjL</a></p>
+                            &mdash; Peter Mick (@ThePeterMick) 
+                            <a href="https://twitter.com/ThePeterMick/status/1827255251721703649?ref_src=twsrc%5Etfw">August 24, 2024</a>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+var itemsReply = (function() {
+  // Collect all tweet text elements (you might adjust this selector as needed)
+  const tweetTextElements = document.querySelectorAll('[data-testid="tweetText"]');
+  const tweets = [];
+
+  tweetTextElements.forEach(tweetTextEl => {
+    // Try to identify the tweet container; many tweets are wrapped in an <article> element.
+    let tweetContainer = tweetTextEl.closest('article');
+    if (!tweetContainer) {
+      tweetContainer = tweetTextEl.parentElement;
+    }
+    
+    // Extract tweet text
+    const tweetText = tweetTextEl.textContent.trim();
+    
+    // Extract user details from data-testid "User-Name" if available
+    const userNameEl = tweetContainer.querySelector('[data-testid="User-Name"] span');
+    const userName = userNameEl ? userNameEl.textContent.trim() : null;
+    
+    // Extract user handle from the anchor's href in the container.
+    const userLinkEl = tweetContainer.querySelector('div.css-175oi2r.r-1wbh5a2.r-dnmrzs a[role="link"]');
+    let userHandle = null;
+    if (userLinkEl) {
+      userHandle = userLinkEl.getAttribute('href').replace(/^\//, '');
+    }
+    
+    // Check if the user is verified (by looking for an svg with aria-label "Verified account")
+    const verifiedEl = tweetContainer.querySelector('svg[aria-label="Verified account"]');
+    const verified = !!verifiedEl;
+    
+    // Extract timestamp and tweet permalink from the <time> element inside an anchor
+    const timeAnchor = tweetContainer.querySelector('a time');
+    let timestamp = null;
+    let tweetLink = null;
+    if (timeAnchor) {
+      timestamp = { 
+        datetime: timeAnchor.getAttribute('datetime'), 
+        display: timeAnchor.textContent.trim() 
+      };
+      tweetLink = timeAnchor.parentElement.getAttribute('href');  // Tweet permalink
+    }
+    
+    // **Skip this tweet if the timestamp is null (AD)**
+    if (!timestamp) return;
+
+    // Helper to extract numeric counts from a button based on its selector.
+    const getCount = (selector) => {
+      const btn = tweetContainer.querySelector(selector);
+      if (!btn) return 0;
+      const span = btn.querySelector('span');
+      return span ? parseInt(span.textContent.trim(), 10) || 0 : 0;
+    };
+
+    // Extract engagement counts using data-testid attributes for reply, retweet, and like buttons.
+    const replies = getCount('button[data-testid="reply"]');
+    const retweets = getCount('button[data-testid="retweet"]');
+    const likes = getCount('button[data-testid="like"]');
+    
+    // Extract views from an anchor with an aria-label containing "views"
+    let views = 0;
+    const analyticsLink = tweetContainer.querySelector('a[aria-label*="views"]');
+    if (analyticsLink) {
+      const span = analyticsLink.querySelector('span');
+      views = span ? parseInt(span.textContent.trim(), 10) || 0 : 0;
+    }
+    
+    // Construct the full reply link using x.com domain
+    const replyLink = tweetLink ? `https://x.com${tweetLink}` : null;
+    
+    // Extract links inside the tweet text.
+    // For t.co shortened links, attempt to use "data-expanded-url" to get the actual link.
+    const linkElements = tweetTextEl.querySelectorAll('a');
+    const links = [];
+    linkElements.forEach(linkEl => {
+      let url = linkEl.getAttribute('href');
+      // Ensure it's a real link, not an internal X.com link
+      if (url && !url.startsWith('/')) {
+        if (url.startsWith('https://t.co')) {
+          // Try to get the expanded URL from the attribute, or fallback to the href property.
+          const expanded = linkEl.getAttribute('data-expanded-url') || linkEl.href;
+          url = expanded;
+        }
+        // Add the link if it's not empty
+        if (url.trim() !== '') {
+          links.push(url);
+        }
+      }
+    });
+
+    tweets.push({
+      user: {
+        name: userName,
+        handle: userHandle,
+        verified: verified
+      },
+      timestamp: timestamp,
+      tweetText: tweetText,
+      engagement: {
+        replies: replies,
+        retweets: retweets,
+        likes: likes,
+        views: views
+      },
+      replyLink: replyLink,
+      links: links  // New section: Extracted links from the tweet text
+    });
+  });
+
+  // Output the structured data as JSON in the console.
+  console.log(JSON.stringify(tweets, null, 2));
+  return tweets;
+})();
+
+
+I have been using it, the data is from analysis is great very good
+
+I just wished it help me
+- create better content base on the trend detected
+- show me content that can get me more reach as the ones that getting more engagements
+- This [[[AI Content Analysis
+Coming soon
+Advanced AI-powered content analysis and recommendations.]]] should come very soon
+Thats the real value for real - use the analysis to help create better content that can make your contents reach more in the communities
+
+
+
+def pitch_list_view(request):
+    metadata_list = []
+    pitch_json = ""
+    error = None
+
+    if request.method == "POST":
+        pitch_json = request.POST.get("pitch_json", "")
+        try:
+            # Expect a list of pitch objects
+            pitches = json.loads(pitch_json)
+            if not isinstance(pitches, list):
+                raise ValueError("Expected a list of pitch objects.")
+        except (json.JSONDecodeError, ValueError) as e:
+            error = f"Invalid JSON: {e}"
+        else:
+            # Loop through each pitch and extract metadata using the first link in the pitch's "links" array.
+            for pitch in pitches:
+                links = pitch.get("links", [])
+                if links and len(links) > 0:
+                    first_link = links[0]
+                    metadata = get_site_metadata(first_link)
+                    if metadata:
+                        # Optionally, add extra pitch info (e.g., tweetText) if needed.
+                        metadata_list.append(metadata)
+                # Skip pitch objects that have no links.
+            if not metadata_list:
+                error = "No valid pitches with external links found."
+                
+    return render(request, "pitch_list_view.html", {
+        "metadata_list": metadata_list,
+        "pitch_json": pitch_json,
+        "error": error
+  
+  
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Directory Leaderboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    
+    .leaderboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .leaderboard-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    
+    .saas-card {
+      height: 500px; /* 9:16 ratio from width ~280px */
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: white;
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .saas-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-image-container {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    
+    .card-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .rank-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #ff7b25;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .card-description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.8rem;
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .card-category {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #3273dc;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .tag {
+      font-size: 0.7rem !important;
+      height: auto !important;
+      padding: 0.2rem 0.6rem !important;
+    }
+    
+    .card-stats {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .fire-icon {
+      color: #ff4d4d;
+      margin-right: 0.3rem;
+    }
+    
+    .clap-icon {
+      color: #3273dc;
+      margin-right: 0.3rem;
+    }
+    
+    .card-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.8rem;
+    }
+    
+    .website-link, .x-link {
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .website-link:hover, .x-link:hover {
+      color: #3273dc;
+    }
+    
+    .website-link i, .x-link i {
+      margin-right: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="leaderboard-container">
+    <h1 class="leaderboard-title">Leaderboard</h1>
+    
+    <div class="columns is-multiline">
+      <!-- SaaS Card 1 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">1</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">Taskify</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Project Management
+            </div>
+            <p class="card-description">An AI-powered project management tool that simplifies task tracking and team collaboration with smart automation features.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Productivity</span>
+              <span class="tag is-light">AI</span>
+              <span class="tag is-light">Team</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 423
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 189
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 2 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">2</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">InvoiceMaster</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Finance
+            </div>
+            <p class="card-description">Streamline your invoicing process with automated reminders, payment tracking, and customizable templates for businesses of all sizes.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Finance</span>
+              <span class="tag is-light">Invoicing</span>
+              <span class="tag is-light">SMB</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 382
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 157
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 3 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">3</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">ContentFlow</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Marketing
+            </div>
+            <p class="card-description">Generate, schedule, and analyze content across multiple platforms with AI-assisted creation tools and performance metrics.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Content</span>
+              <span class="tag is-light">Social Media</span>
+              <span class="tag is-light">Analytics</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 356
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 142
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 4 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">4</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">DataVizPro</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Analytics
+            </div>
+            <p class="card-description">Transform complex data into insightful visualizations with no-code dashboards and automated reporting for data-driven decision making.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Data</span>
+              <span class="tag is-light">Visualization</span>
+              <span class="tag is-light">Reporting</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 329
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 118
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Directory Leaderboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    
+    .leaderboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .leaderboard-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    
+    .saas-card {
+      height: 500px; /* 9:16 ratio from width ~280px */
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: white;
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .saas-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-image-container {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    
+    .card-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .rank-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #ff7b25;
+      color: white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .card-description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.8rem;
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .card-category {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #3273dc;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .tag {
+      font-size: 0.7rem !important;
+      height: auto !important;
+      padding: 0.2rem 0.6rem !important;
+    }
+    
+    .card-stats {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .fire-icon {
+      color: #ff4d4d;
+      margin-right: 0.3rem;
+    }
+    
+    .clap-icon {
+      color: #3273dc;
+      margin-right: 0.3rem;
+    }
+    
+    .card-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.8rem;
+    }
+    
+    .website-link, .x-link {
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .website-link:hover, .x-link:hover {
+      color: #3273dc;
+    }
+    
+    .website-link i, .x-link i {
+      margin-right: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="leaderboard-container">
+    <h1 class="leaderboard-title">Leaderboard</h1>
+    
+    <div class="columns is-multiline">
+      <!-- SaaS Card 1 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">1</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">Taskify</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Project Management
+            </div>
+            <p class="card-description">An AI-powered project management tool that simplifies task tracking and team collaboration with smart automation features.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Productivity</span>
+              <span class="tag is-light">AI</span>
+              <span class="tag is-light">Team</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 423
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 189
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 2 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">2</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">InvoiceMaster</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Finance
+            </div>
+            <p class="card-description">Streamline your invoicing process with automated reminders, payment tracking, and customizable templates for businesses of all sizes.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Finance</span>
+              <span class="tag is-light">Invoicing</span>
+              <span class="tag is-light">SMB</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 382
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 157
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 3 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">3</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">ContentFlow</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Marketing
+            </div>
+            <p class="card-description">Generate, schedule, and analyze content across multiple platforms with AI-assisted creation tools and performance metrics.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Content</span>
+              <span class="tag is-light">Social Media</span>
+              <span class="tag is-light">Analytics</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 356
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 142
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SaaS Card 4 -->
+      <div class="column is-one-quarter-desktop is-half-tablet">
+        <div class="saas-card">
+          <div class="rank-badge">4</div>
+          <div class="card-image-container">
+            <img src="/api/placeholder/400/300" alt="SaaS Product">
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">DataVizPro</h2>
+            <div class="card-category">
+              <i class="fas fa-folder"></i> Analytics
+            </div>
+            <p class="card-description">Transform complex data into insightful visualizations with no-code dashboards and automated reporting for data-driven decision making.</p>
+            <div class="card-tags">
+              <span class="tag is-light">Data</span>
+              <span class="tag is-light">Visualization</span>
+              <span class="tag is-light">Reporting</span>
+            </div>
+            <div class="card-stats">
+              <div class="stat-item">
+                <i class="fas fa-fire fire-icon"></i> 329
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-hands-clapping clap-icon"></i> 118
+              </div>
+            </div>
+            <div class="card-links">
+              <a href="#" class="website-link">
+                <i class="fas fa-globe"></i> Visit Website
+              </a>
+              <a href="#" class="x-link">
+                <i class="fab fa-x-twitter"></i> View Launch
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+<!-- CSS for the Enhanced Featured Section -->
+<style>
+  /* Featured Hero Section */
+  .featured-section {
+    margin-bottom: 40px;
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .featured-badge {
+    background-color: var(--primary-color);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    display: inline-block;
+    letter-spacing: 1.2px;
+    box-shadow: 0 3px 10px rgba(255, 220, 0, 0.2);
+  }
+
+  .featured-hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 360px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .featured-hero:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .featured-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      0deg, 
+      rgba(0, 0, 0, 0.9) 0%, 
+      rgba(0, 0, 0, 0.7) 30%, 
+      rgba(0, 0, 0, 0.4) 60%, 
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    z-index: 1;
+  }
+
+  .featured-content {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .featured-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+  }
+
+  .featured-description {
+    font-size: 1.1rem;
+    max-width: 700px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 25px;
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .featured-info {
+    display: flex;
+    align-items: center;
+  }
+
+  .featured-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    margin-right: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .featured-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .featured-hero:hover .featured-icon {
+    border-color: var(--primary-color);
+  }
+
+  .featured-hero:hover .featured-icon img {
+    transform: scale(1.1);
+  }
+
+  .featured-creator {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+
+  .featured-stats {
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .stat-item i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    font-size: 1.1rem;
+  }
+
+  .featured-cta {
+    display: flex;
+    gap: 15px;
+  }
+
+  .cta-button {
+    background-color: var(--primary-color);
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(255, 220, 0, 0.3);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 220, 0, 0.4);
+  }
+
+  .cta-button.secondary {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+  }
+
+  .cta-button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .featured-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .featured-tag {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .featured-tag:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .featured-hero {
+      height: 460px;
+    }
+    
+    .featured-title {
+      font-size: 2rem;
+    }
+    
+    .featured-content {
+      padding: 30px;
+    }
+    
+    .featured-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .featured-cta {
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .cta-button {
+      flex: 1;
+    }
+  }
+</style>
+
+<!-- HTML for the Enhanced Featured Section -->
+<div class="featured-section">
+  <div class="featured-badge">FEATURED PITCH</div>
+  
+  {% if featured_pitches %}
+  {% with featured=featured_pitches.0 %}
+  <div class="featured-hero" style="background-image: url('{{ featured.banner_url }}')" onclick="window.location.href='{{ featured.url }}'" onmouseover="this.style.cursor='pointer';">
+    <div class="featured-content">
+      <h1 class="featured-title">{{ featured.name }}</h1>
+      <p class="featured-description">{{ featured.description }}</p>
+      
+      <div class="featured-meta">
+        <div class="featured-info">
+          <div class="featured-icon">
+            <img src="{{ featured.icon_url }}" alt="{{ featured.name }} icon" 
+              onerror="this.onerror=null; this.src='{% static 'icon.png' %}';">
+          </div>
+          
+          <div>
+            <div class="featured-creator">By {{ featured.creator|default:"Anonymous" }}</div>
+            <div class="featured-stats">
+              <div class="stat-item">
+                <i class="fa-solid fa-fire"></i>
+                <span>{{ featured.rank|default:"0" }} Rank</span>
+              </div>
+              <div class="stat-item">
+                <i class="fa-solid fa-hands-clapping"></i>
+                <span>{{ featured.clap|default:"0" }} Claps</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="featured-cta">
+          <a href="{{ featured.url }}" class="cta-button" target="_blank">
+            <i class="fa-solid fa-external-link-alt"></i>
+            <span>Visit Pitch</span>
+          </a>
+          {% if featured.source %}
+          <a href="{{ featured.source }}" class="cta-button secondary" target="_blank">
+            <i class="fa-brands fa-x-twitter"></i>
+            <span>View on 𝕏</span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="featured-tags">
+        <div class="featured-tag">{{ featured.category|default:"Software" }}</div>
+        {% if featured.tags %}
+          {% for tag in featured.tags %}
+            <div class="featured-tag">{{ tag }}</div>
+          {% endfor %}
+        {% else %}
+          <div class="featured-tag">Innovation</div>
+          <div class="featured-tag">Trending</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+  {% endif %}
+</div>
+
+
+
+
+
+
+<!-- CSS for the Enhanced Featured Section -->
+<style>
+  /* Featured Hero Section */
+  .featured-section {
+    margin-bottom: 40px;
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .featured-badge {
+    background-color: var(--primary-color);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    display: inline-block;
+    letter-spacing: 1.2px;
+    box-shadow: 0 3px 10px rgba(255, 220, 0, 0.2);
+  }
+
+  .featured-hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 360px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .featured-hero:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .featured-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      0deg, 
+      rgba(0, 0, 0, 0.9) 0%, 
+      rgba(0, 0, 0, 0.7) 30%, 
+      rgba(0, 0, 0, 0.4) 60%, 
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    z-index: 1;
+  }
+
+  .featured-content {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .featured-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+  }
+
+  .featured-description {
+    font-size: 1.1rem;
+    max-width: 700px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 25px;
+    line-height: 1.6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .featured-info {
+    display: flex;
+    align-items: center;
+  }
+
+  .featured-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    margin-right: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .featured-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .featured-hero:hover .featured-icon {
+    border-color: var(--primary-color);
+  }
+
+  .featured-hero:hover .featured-icon img {
+    transform: scale(1.1);
+  }
+
+
+
+  .featured-cta {
+    display: flex;
+    gap: 15px;
+  }
+
+  .cta-button {
+    background-color: var(--primary-color);
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(255, 220, 0, 0.3);
+  }
+
+  .cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 220, 0, 0.4);
+  }
+
+  .cta-button.secondary {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+  }
+
+  .cta-button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .featured-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .featured-tag {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .featured-tag:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .featured-hero {
+      height: 460px;
+    }
+    
+    .featured-title {
+      font-size: 2rem;
+    }
+    
+    .featured-content {
+      padding: 30px;
+    }
+    
+    .featured-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .featured-cta {
+      width: 100%;
+      margin-top: 20px;
+    }
+    
+    .cta-button {
+      flex: 1;
+    }
+  }
+</style>
+
+<!-- HTML for the Enhanced Featured Section -->
+<div class="featured-section">
+  <div class="featured-badge">FEATURED PITCH</div>
+  
+  {% if featured_pitches %}
+  {% with featured=featured_pitches.0 %}
+  <div class="featured-hero" style="background-image: url('{{ featured.banner_url }}')" onclick="window.location.href='{{ featured.url }}'" onmouseover="this.style.cursor='pointer';">
+    <div class="featured-content">
+      <h1 class="featured-title">{{ featured.name }}</h1>
+      <p class="featured-description">{{ featured.description }}</p>
+      
+      <div class="featured-meta">
+        <div class="featured-info">
+          <div class="featured-icon">
+            <img src="{{ featured.icon_url }}" alt="{{ featured.name }} icon" 
+              onerror="this.onerror=null; this.src='{% static 'icon.png' %}';">
+          </div>
+        </div>
+        
+        <div class="featured-cta">
+          <a href="{{ featured.url }}" class="cta-button" target="_blank">
+            <i class="fa-solid fa-external-link-alt"></i>
+            <span>Visit Pitch</span>
+          </a>
+          {% if featured.source %}
+          <a href="{{ featured.source }}" class="cta-button secondary" target="_blank">
+            <i class="fa-brands fa-x-twitter"></i>
+            <span>View on 𝕏</span>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="featured-tags">
+        <div class="featured-tag">{{ featured.category|default:"Software" }}</div>
+        {% if featured.tags %}
+          {% for tag in featured.tags %}
+            <div class="featured-tag">{{ tag }}</div>
+          {% endfor %}
+        {% else %}
+          <div class="featured-tag">Innovation</div>
+          <div class="featured-tag">Trending</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+  {% endif %}
+</div>
+
+
+
+
+
+
+
+
+{% load static %}
+{% load i18n %}
+
+<style>
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 30px 30px;
+      background-color: var(--dark-bg);
+      position: relative;
+    }
+
+    /* Top navigation */
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 15px 0;
+    }
+
+    /* Button styles */
+    .nav-filters button,
+    .action-button {
+      border-radius: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-filters button {
+      background-color: transparent;
+      color: var(--text-light);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+
+    .nav-filters button.active {
+      background-color: var(--primary-color);
+      color: #000;
+      border-color: var(--primary-color);
+    }
+
+    .nav-filters button:hover:not(.active) {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .action-button {
+      background-color: var(--primary-color);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .action-button:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .action-button i {
+      margin-right: 8px;
+    }
+    
+    /* Featured Hero Section */
+    .featured-section {
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+    }
+  
+    .featured-badge {
+      background-color: var(--primary-color);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      display: inline-block;
+      letter-spacing: 1.2px;
+      box-shadow: 0 3px 10px rgba(255, 220, 0, 0.2);
+    }
+  
+    .featured-hero {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      height: auto;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: flex-end;
+      transition: all 0.3s ease;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+  
+    .featured-hero:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+  
+    .featured-hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000db; /* Semi-transparent black overlay */);
+      z-index: 1;
+    }
+  
+    .featured-content {
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var( --primary-color);
+    }
+  
+    .featured-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      line-height: 1.2;
+      align-items: center;
+    }
+  
+    .featured-description {
+      font-size: 1.1rem;
+      max-width: 700px;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 25px;
+      line-height: 1.6;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  
+    .featured-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+  
+    .featured-info {
+      display: flex;
+      align-items: center;
+    }
+  
+    .featured-icon {
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      margin-right: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  
+    .featured-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+  
+    .featured-hero:hover .featured-icon {
+      border-color: var(--primary-color);
+    }
+  
+    .featured-hero:hover .featured-icon img {
+      transform: scale(1.1);
+    }
+  
+  
+  
+    .featured-cta {
+      display: flex;
+      gap: 15px;
+    }
+  
+    .cta-button {
+      background-color: var(--primary-color);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 15px rgba(255, 220, 0, 0.3);
+    }
+  
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 220, 0, 0.4);
+    }
+  
+    .cta-button.secondary {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+    }
+  
+    .cta-button.secondary:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  
+    .featured-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 25px;
+    }
+  
+    .featured-tag {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease;
+    }
+  
+    .featured-tag:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+  
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .featured-hero {
+        height: 460px;
+      }
+      
+      .featured-title {
+        font-size: 2rem;
+      }
+      
+      .featured-content {
+        padding: 30px;
+      }
+      
+      .featured-meta {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .featured-cta {
+        width: 100%;
+        margin-top: 20px;
+      }
+      
+      .cta-button {
+        flex: 1;
+      }
+    }
+
+    /* Section headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+
+    .section-link {
+      color: var(--primary-color);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-link i {
+      margin-left: 5px;
+      font-size: 0.8rem;
+    }
+
+    /* Cards and grids */
+    .upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    /* Card shared styles */
+    .upcoming-card,
+    .new-pitch-item {
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .upcoming-card {
+      overflow: hidden;
+    }
+
+    .upcoming-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-hover);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .countdown-badge {
+      background-color: #ff4757;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 2;
+    }
+
+    .card-image {
+      position: relative;
+      aspect-ratio: 16/9;
+      background-color: #2a2a2a;
+      overflow: hidden;
+    }
+
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .upcoming-card:hover .card-image img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-light);
+      margin: 0;
+    }
+
+    .card-category {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
+    }
+
+    /* Description styles */
+    .card-description,
+    .new-pitch-desc {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-description {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 15px;
+      -webkit-line-clamp: 2;
+      height: 38px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .card-tag {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-stats {
+      gap: 12px;
+    }
+
+    .card-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .card-link {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--text-light);
+      transition: all 0.2s ease;
+    }
+
+    .card-link:hover {
+      background-color: var(--primary-color);
+      color: #000;
+    }
+
+    /* New pitches section with line separators */
+    .new-pitches-list {
+      margin:0 -30px;
+      margin-bottom: 40px;
+      animation: fadeIn 0.6s ease-out;
+      overflow: hidden;
+      background-color: var(--card-bg);
+    }
+    
+    .new-pitch-item {
+      display: flex;
+      align-items: center;
+      padding: 2rem 30px;
+      transition: transform 0.2s ease;
+      border-bottom: 1px solid var(--border-light);
+    }
+        
+    .all-pitch-box {
+      position: relative;
+      border: 1px solid #8080805c;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Remove border from last item */
+    .new-pitch-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Alternate background colors using Django template */
+    .new-pitch-item:nth-child(odd) {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    
+    .new-pitch-item:hover {
+      transform: translateX(5px);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .new-pitch-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-right: 15px;
+    }
+    
+    .new-pitch-content {
+      flex: 1;
+    }
+    
+    .new-pitch-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 2px;
+    }
+    
+    .new-pitch-desc {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .new-pitch-date {
+      color: var(--primary-color);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-left: auto;
+      padding-left: 15px;
+      white-space: nowrap;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .pagination a, 
+    .pagination span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      margin: 0 5px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .pagination a {
+      background-color: #222;
+      color: var(--text-light);
+      border: 1px solid #333;
+    }
+
+    .pagination a:hover {
+      background-color: #333;
+    }
+
+    .pagination .current {
+      background-color: var(--primary-color);
+      color: #000;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="main-content">
+    <!-- Top Navigation -->
+    <div class="main-header">
+      <div class="nav-filters">
+        <button class="active">All</button>
+        <button>Featured</button>
+        <button>Trending</button>
+        <button>New</button>
+      </div>
+      <div>
+        <a href="{% url "claim_pitch" %}" class="button is-warning action-button">
+          <i class="fa-solid fa-plus"></i>
+          Claim Pitch
+        </a>
+      </div>
+    </div>
+    
+    <!-- Featured Hero Section -->
+
+    {% include "./featured.html" %}
+
+
+      <!-- Improved New Pitches Section -->
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fa-solid fa-star"></i>
+        New Pitches
+      </h2>
+      <a href="#" class="section-link">
+        View All
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="new-pitches-grid">
+      {% for pitch in new_pitches %}
+      <div class="new-pitch-card">
+        <div class="new-pitch-header">
+          <div class="new-pitch-icon">
+            <a href="{% url 'detail' pitch.slug %}">
+              <img src="{{ pitch.icon_url }}" 
+                  onerror="this.onerror=null; this.src='{% static 'icon.png' %}';" 
+                  alt="{{ pitch.name }} icon">
+            </a>
+          </div>
+          <div class="new-pitch-info">
+            <h3 class="new-pitch-title">
+              <a href="{% url 'detail' pitch.slug %}">{{ pitch.name }}</a>
+            </h3>
+            <p class="new-pitch-desc">{{ pitch.description|default:"Software" }}</p>
+          </div>
+        </div>
+        
+        <div class="new-pitch-stats">
+          <div class="pitch-stat">
+            <i class="fa-solid fa-hands-clapping"></i>
+            <span>{{ pitch.clap }} Claps</span>
+          </div>
+          <div class="pitch-stat">
+            <i class="fa-solid fa-fire"></i>
+            <span>{{ pitch.rank }} Rank</span>
+          </div>
+        </div>
+        
+        <div class="new-pitch-actions">
+          {% if pitch.source %}
+          <a href="{{ pitch.source }}" class="pitch-action source-action" target="_blank" rel="noopener">
+            <span>𝕏</span>
+            <span>Pitch</span>
+          </a>
+          {% endif %}
+          <a href="{{ pitch.url }}" class="pitch-action visit-action" target="_blank" rel="noopener">
+            <i class="fa-solid fa-external-link-alt"></i>
+            <span>Visit</span>
+          </a>
+          <a href="{% url 'detail' pitch.slug %}" class="pitch-action details-action">
+            <i class="fas fa-info-circle"></i>
+            <span>Details</span>
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-pitches">
+        <div class="notification is-warning">No new pitches available</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <style>
+      /* New Pitches Grid Layout */
+      .new-pitches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+        animation: fadeIn 0.6s ease-out;
+      }
+      
+      /* New Pitch Card */
+      .new-pitch-card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .new-pitch-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      }
+      
+      /* Card Header */
+      .new-pitch-header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .new-pitch-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-right: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+      }
+      
+      .new-pitch-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      
+      .new-pitch-card:hover .new-pitch-icon img {
+        transform: scale(1.1);
+      }
+      
+      .new-pitch-info {
+        flex: 1;
+        overflow: hidden;
+      }
+      
+      .new-pitch-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-light);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      
+      .new-pitch-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      
+      .new-pitch-title a:hover {
+        color: var(--primary-color);
+      }
+      
+      .new-pitch-desc {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+        max-height: 40px;
+      }
+      
+      /* Stats Section */
+      .new-pitch-stats {
+        display: flex;
+        padding: 15px 20px;
+        background-color: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .pitch-stat {
+        display: flex;
+        align-items: center;
+        margin-right: 20px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .pitch-stat i {
+        margin-right: 6px;
+        font-size: 0.85rem;
+      }
+      
+      .pitch-stat:first-child i {
+        color: #4CAF50;
+      }
+      
+      .pitch-stat:nth-child(2) i {
+        color: var(--primary-color);
+      }
+      
+      /* Actions Section */
+      .new-pitch-actions {
+        display: flex;
+        padding: 15px 20px;
+        margin-top: auto;
+        justify-content: space-between;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      
+      .pitch-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+      }
+      
+      .pitch-action i,
+      .pitch-action span:first-child {
+        margin-right: 6px;
+      }
+      
+      .source-action {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .source-action:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      .visit-action {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-light);
+      }
+      
+      .visit-action:hover {
+        background-color: rgba(255, 220, 0, 0.15);
+        color: var(--primary-color);
+      }
+      
+      .details-action {
+        background-color: var(--primary-color);
+        color: #000;
+      }
+      
+      .details-action:hover {
+        background-color: var(--primary-dark, #e6c300);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 220, 0, 0.2);
+      }
+      
+      /* Empty State */
+      .empty-pitches {
+        grid-column: 1 / -1;
+      }
+      
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .new-pitches-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .new-pitch-actions {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        
+        .pitch-action {
+          flex: 1;
+          min-width: 100px;
+        }
+      }
+    </style>
+    
+    
+    <!-- Regular Pitches Section -->
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fa-solid fa-list"></i>
+        All Pitches
+      </h2>
+    </div>
+    <div class="new-pitches-list">
+      {% for pitch in pitches %}
+      <div class="new-pitch-item">
+        <div class="new-pitch-icon">
+          <a href="{% url "detail" pitch.slug %}">
+            <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }} icon" 
+                onerror="this.onerror=null; this.src='{% static 'icon.png' %}';">
+          </a>
+        </div>
+        <div class="new-pitch-content">
+          <a href="{% url "detail" pitch.slug %}">
+            <div class="new-pitch-name has-text-white">{{ pitch.name }}</div>
+          </a>
+          <div class="new-pitch-desc">{{ pitch.description }}</div>
+        </div>
+        
+        <a href="{% url "detail" pitch.slug %}" class="button is-warning is-rounded is-small">
+          <i class="fas fa-eye"></i>
+          View 
+        </a>
+      </div>
+      {% empty %}
+      <div class="notification is-warning">No new pitches available</div>
+      {% endfor %}
+    </div>
+
+    
+    <!-- Pagination -->
+    {% if pitches.has_other_pages %}
+    <nav class="pagination" role="navigation" aria-label="pagination">
+      {% if pitches.has_previous %}
+      <a href="?page={{ pitches.previous_page_number }}" class="pagination-previous">
+        <i class="fas fa-chevron-left"></i>
+      </a>
+      {% endif %}
+      
+      {% if pitches.has_next %}
+      <a href="?page={{ pitches.next_page_number }}" class="pagination-next">
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      {% endif %}
+      
+      <ul class="pagination-list">
+        {% for i in pitches.paginator.page_range %}
+        {% if pitches.number == i %}
+        <li><span class="pagination-link is-current">{{ i }}</span></li>
+        {% else %}
+        <li><a href="?page={{ i }}" class="pagination-link">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+
+
+
+
+
+
+
+
+
+

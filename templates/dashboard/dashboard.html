@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitchedlink | Dashboard</title>
+    <link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FFB70F;
+            --primary-light: #FFF4D9;
+            --text: #2d3748;
+            --text-light: #718096;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #eaeaea;
+            --radius: 0.75rem;
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+        /* Minimal Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+        .stats-card .icon {
+            margin-bottom: 0.75rem;
+        }
+        .stats-card .title {
+            margin-bottom: 0.25rem;
+        }
+        .stats-card .subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Tool Cards */
+        .subtitle {
+            margin-top: 0px !important;
+        }
+        .tool-card {
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+            padding: 1.25rem;
+            height: 100%;
+        }
+        .tool-card:hover {
+            background-color: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        /* Pitch Cards */
+        .pitch-card {
+            position: relative;
+        }
+        .pitch-card .media-content {
+            padding-right: 1.5rem;
+        }
+        .pitch-card .tag {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+        .pitch-meta {
+            display: flex;
+            gap: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn-minimal {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            transition: var(--transition);
+        }
+        .btn-minimal:hover {
+            background-color: #f8f9fa;
+            border-color: #dcdcdc;
+        }
+
+        /* Section Titles */
+        .section-title {
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+        }
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+
+        /* Onboarding */
+        .onboarding-notification {
+            border-left: 3px solid var(--primary);
+            padding: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-card {
+                padding: 1.25rem 0.75rem;
+            }
+            .pitch-meta {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+            .navbar-menu {
+                box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            }
+        }
+
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #FFB70F;
+            --secondary-color: #0088cc;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --text-light: #333333;
+            --text-muted: rgba(0, 0, 0, 0.6);
+            --card-bg: #ffffff;
+            --border-light: rgba(0, 0, 0, 0.1);
+            --border-hover: rgba(255, 183, 15, 0.5);
+            --launched-badge: #28a745;
+            --featured-badge: #e63946;
+            --background-color: #ffffff;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #333333;
+            --navbar-border: rgba(255, 183, 15, 0.3);
+            --navbar-shadow: 0 0 20px rgba(255, 183, 15, 0.4),
+                            0 0 40px rgba(255, 183, 15, 0.15),
+                            0 8px 32px rgba(0, 0, 0, 0.2);
+            --navbar-hover-shadow: 0 0 30px rgba(255, 183, 15, 0.6),
+                                0 0 60px rgba(255, 183, 15, 0.25),
+                                0 15px 50px rgba(0, 0, 0, 0.25);
+        }
+                
+        /* Common navbar styles */
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            border-radius: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .navbar-brand .navbar-item span {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand .navbar-item span>span {
+            color: var(--text-light) !important;
+            opacity: 0.8;
+        }
+
+        .navbar-burger {
+            color: var(--text-light) !important;
+        }
+
+        .navbar-menu, .navbar-link {
+            background-color: transparent !important;
+        }
+
+        @media screen and (max-width: 1023px) {
+            .navbar-menu {
+                background-color: #ffffff !important;
+                border: 1px solid rgba(0, 0, 0, 0.1) !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+                border-radius: 8px !important;
+                margin-top: 0.5rem !important;
+            }
+            
+            .navbar-menu .navbar-item,
+            .navbar-menu .navbar-link {
+                color: #333333 !important;
+                padding: 0.75rem 1.5rem !important;
+            }
+            
+            .navbar-menu .navbar-item:hover,
+            .navbar-menu .navbar-link:hover {
+                background-color: rgba(255, 183, 15, 0.1) !important;
+                color: var(--primary-color) !important;
+            }
+        }
+
+            .navbar-item {
+                color: var(--text-color) !important;
+                transition: all 0.2s ease;
+            }
+
+            .navbar-item:hover {
+                background-color: rgba(255, 215, 0, 0.15) !important;
+                color: var(--primary-color) !important;
+                transform: translateY(-1px);
+                transition: all 0.2s ease-in-out;
+            }
+
+            .navbar-item.is-active {
+                background-color: rgba(255, 183, 15, 0.15) !important;
+                color: var(--primary-color) !important;
+            }
+
+            .navbar-item i {
+                margin-right: 8px;
+            }
+
+            .navbar-dropdown {
+                background-color: #ffffff !important;
+                border: 1px solid rgba(0, 0, 0, 0.1) !important;
+                {% comment %} box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; {% endcomment %}
+                padding: 0.5rem 0 !important;
+            }
+
+            .navbar-dropdown .navbar-item:not(.is-active,.is-selected) {
+                color: #333333 !important;
+                background: transparent !important;
+                padding: 0.5rem 1.5rem !important;
+                font-size: 0.95rem !important;
+                transition: all 0.2s ease !important;
+                white-space: nowrap !important;
+            }
+
+            .navbar-dropdown .navbar-item:not(.is-active,.is-selected):hover {
+                background-color: rgba(255, 183, 15, 0.1) !important;
+                color: var(--primary-color) !important;
+                transform: translateX(4px) !important;
+            }
+
+            /* Ensure active/selected states are also styled */
+            .navbar-dropdown .navbar-item.is-active,
+            .navbar-dropdown .navbar-item.is-selected {
+                background-color: rgba(255, 183, 15, 0.15) !important;
+                color: var(--primary-color) !important;
+            }
+
+            .navbar-link:not(.is-arrowless)::after {
+                border-color: #333333 !important;
+                transition: border-color 0.2s ease !important;
+            }
+
+            .navbar-link:hover:not(.is-arrowless)::after,
+            .navbar-link:hover::after {
+                border-color: var(--primary-color) !important;
+            }
+
+            .card.stats-card > .subtitle{
+                font-size: 12px !important;
+            }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar" role="navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="{% url 'dashboard' %}" class="navbar-item">
+                <span>pitched<span>link</span></span>
+            </a>
+            <a role="button" class="navbar-burger" data-target="navbarMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </a>
+        </div>
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a href="{% url 'dashboard' %}" class="navbar-item is-active">Dashboard</a>
+                <a href="#my-pitches" class="navbar-item">My Pitches</a>
+                <a href="{% url 'index' %}#new-pitches" class="navbar-item">New Pitches</a>
+                <a href="{% url 'leaderboard' %}" class="navbar-item">Leaderboard</a>
+            </div>
+            <div class="navbar-end">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        <i class="fas fa-user-circle"></i>&nbsp;{{ request.user.get_full_name  }}
+                    </a>
+                    <div class="navbar-dropdown is-right">
+                        <a href="{% url 'dashboard' %}" class="navbar-item">Dashboard</a>
+                        <a href="#" class="navbar-item">Settings</a>
+                        <hr class="navbar-divider">
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="button is-white is-fullwidth">
+                                <i class="fas fa-sign-out-alt"></i>&nbsp;Sign out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="notification is-{{ message.tags }}">
+            {{ message }}
+            <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% block content %}
+    <!-- Main Content -->
+    <section class="section pt-5">
+        <div class="container">
+
+            <!-- Onboarding -->
+            {% if not user.profile.onboarding_complete %}
+            <div class="notification is-white onboarding-notification mb-6">
+                <div class="is-flex is-align-items-center">
+                    <div class="mr-4">
+                        <span class="icon is-large has-text-primary mb-0">
+                            <i class="fas fa-rocket fa-lg"></i>
+                        </span>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="title is-5 mb-2">Connect your X account</h4>
+                        <p class="subtitle is-6 mb-3">Find and claim your startup mentions in seconds</p>
+                        <button onclick="openOnboardingModal()" class="button is-primary is-light">
+                            <i class="fab fa-twitter-x"></i>&nbsp;Connect X.com
+                        </button>
+                    </div>
+                    <button class="delete" onclick="this.parentElement.parentElement.style.display='none'"></button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Stats -->
+            <div class="columns is-multiline mb-6 is-mobile">
+                <div class="column is-4">
+                    <div class="card stats-card">
+                        <span class="icon has-text-info is-large mb-0">
+                            <i class="fas fa-layer-group"></i>
+                        </span>
+                        <p class="title is-3">{{ user_stats.total_owned }}</p>
+                        <p class="subtitle is-6">Your Pitches</p>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="card stats-card">
+                        <span class="icon has-text-success is-large mb-0">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                        <p class="title is-3">{{ user_stats.verified_claims }}</p>
+                        <p class="subtitle is-6">Claimed</p>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="card stats-card">
+                        <span class="icon has-text-primary is-large mb-0">
+                            <i class="fas fa-chart-line"></i>
+                        </span>
+                        <p class="title is-3">{{ user_stats.total_engagement }}</p>
+                        <p class="subtitle is-6">Engagement</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Afterlaunch Tools -->
+            <div class="mb-6">
+                <div class="section-title">
+                    <h2 class="title is-4 mb-0">
+                        <span class="icon-text">
+                            <span class="icon"><i class="fas fa-tools"></i></span>
+                            <span>Afterlaunch Tools</span>
+                        </span>
+                    </h2>
+                    {% if user_stats.pending_claims > 0 %}
+                    <span class="tag is-warning is-light">{{ user_stats.pending_claims }} pending</span>
+                    {% endif %}
+                </div>
+                
+                <div class="columns is-multiline">
+                    <div class="column is-4">
+                        <a href="{% url 'claim_pitch' %}">
+                            <div class="card tool-card">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon has-text-info">
+                                            <i class="fas fa-clipboard-check fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h3 class="title is-5 mb-2">Claim Pitches</h3>
+                                        <p class="subtitle is-6">Review and verify mentions of your startup</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="{% url 'claim_pitch' %}" class="button is-light is-small">
+                                        Review <i class="fas fa-arrow-right ml-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="column is-4">
+                        <a href="{% url 'pitch_generator' %}">
+                            <div class="card tool-card">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon has-text-primary">
+                                            <i class="fas fa-bullhorn fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h3 class="title is-5 mb-2">Pitch Reply Generator</h3>
+                                        <p class="subtitle is-6">Create high-impact startup reply pitches on the fly</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button class="button is-light is-small">
+                                        Write <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="column is-4">
+                        <a href="{% url 'article_writer' %}">
+                            <div class="card tool-card">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon has-text-primary">
+                                            <i class="fas fa-bullhorn fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h3 class="title is-5 mb-2">SEO Article Writer</h3>
+                                        <p class="subtitle is-6">Writes high-quality SEO articles for your startup</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button class="button is-light is-small">
+                                        Write <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Claimed Pitches -->
+            <div id="my-pitches" class="mb-6">
+                <div class="section-title">
+                    <h2 class="title is-4 mb-0">
+                        <span class="icon-text">
+                            <span class="icon"><i class="fas fa-rocket"></i></span>
+                            <span>Your Claimed Pitches</span>
+                        </span>
+                    </h2>
+                    {% if claimed_pitches %}
+                    <a href="{% url 'pitches' %}?status=claimed" class="button is-text is-small">View All</a>
+                    {% endif %}
+                </div>
+                
+                {% if claimed_pitches %}
+                <div class="columns is-multiline">
+                    {% for pitch in claimed_pitches|slice:":3" %}
+                    <div class="column is-4">
+                        <a href="{% url 'detail' slug=pitch.slug %}">
+                            <div class="card pitch-card">
+                                <div class="card-content">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            {% if pitch.icon_url %}
+                                            <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
+                                            {% else %}
+                                            <div class="image is-48x48 has-background-light has-text-centered pt-2">
+                                                <i class="fas fa-rocket has-text-primary"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="media-content">
+                                            <p class="title is-5 mb-1">{{ pitch.name }}</p>
+                                            <p class="subtitle is-6 has-text-grey">
+                                                {{ pitch.category.name|default:"Uncategorized" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="content mt-3">
+                                        <div class="pitch-meta">
+                                            <span><i class="fas fa-bullhorn"></i> {{ pitch.mention_count }} mentions</span>
+                                            <span><i class="fas fa-gem has-text-danger"></i> Rank {{ pitch.rank }}</span>
+                                            <span><i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.clap }} claps</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="tag is-success is-light">Verified</span>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <span class="icon">
+                        <i class="fas fa-inbox"></i>
+                    </span>
+                    <h3 class="title is-5 mt-3">No pitches yet</h3>
+                    <p class="subtitle is-6">Claim your first startup pitch to get started.</p>
+                    <a href="{% url 'claim_pitch' %}" class="button is-primary mt-3">
+                        <i class="fas fa-plus"></i>&nbsp;Claim One
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Suggested Pitches -->
+            <div class="mb-6">
+                <div class="section-title">
+                    <h2 class="title is-4 mb-0">
+                        <span class="icon-text">
+                            <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                            <span>Suggested Pitches</span>
+                        </span>
+                    </h2>
+                    {% if suggested_pitches %}
+                    <a href="{% url 'pitches' %}" class="button is-text is-small">See More</a>
+                    {% endif %}
+                </div>
+                
+                {% if suggested_pitches %}
+                <div class="columns is-multiline">
+                    {% for pitch in suggested_pitches|slice:":3" %}
+                    <div class="column is-4">
+                        <div class="card pitch-card">
+                            <div class="card-content">
+                                <div class="media">
+                                    <div class="media-left">
+                                        {% if pitch.icon_url %}
+                                        <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
+                                        {% else %}
+                                        <div class="image is-48x48 has-background-light has-text-centered pt-2">
+                                            <i class="fas fa-cube has-text-info"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="media-content">
+                                        <p class="title is-5 mb-1">{{ pitch.name }}</p>
+                                        <p class="subtitle is-6 has-text-grey">
+                                            {{ pitch.category.name|default:"Uncategorized" }}
+                                        </p>
+                                    </div>
+                                    <div class="media-right">
+                                        <span class="tag is-info is-light">
+                                            {{ pitch.get_engagement_score }} <i class="fas fa-fire ml-1"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="content mt-3">
+                                    <p>{{ pitch.description|truncatewords:20 }}</p>
+                                </div>
+                                <div class="level is-mobile mt-4">
+                                    <div class="level-left">
+                                        <span class="icon-text mr-3"><i class="far fa-comment-alt"></i>&nbsp;{{ pitch.total_engagement.replies }}</span>
+                                        <span class="icon-text"><i class="fas fa-heart has-text-danger"></i>&nbsp;{{ pitch.total_engagement.likes }}</span>
+                                    </div>
+                                    <div class="level-right">
+                                        <button onclick="openClaimModal({{ pitch.id }}, '{{ pitch.name|escapejs }}')" class="button is-small is-link is-outlined">
+                                            Claim <i class="fas fa-hand-holding-hand ml-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <span class="icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </span>
+                    <p class="subtitle is-6 mt-3">No suggestions yet. Check back soon!</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Onboarding Modal -->
+    <div class="modal p-4" id="onboardingModal">
+        <div class="modal-background" onclick="closeOnboardingModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Connect Your X Account</p>
+                <button class="delete" onclick="closeOnboardingModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <form method="post" action="{% url 'onboard_user' %}">
+                    {% csrf_token %}
+                    <div class="field">
+                        <label class="label">Your X.com Handle</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" name="x_handle" placeholder="e.g. yourhandle" required>
+                            <span class="icon is-left">
+                                <i class="fab fa-twitter-x"></i>
+                            </span>
+                        </div>
+                        <p class="help">We'll search for mentions of your startup</p>
+                    </div>
+                    <div class="field mt-5">
+                        <div class="control">
+                            <button type="submit" class="button is-primary is-fullwidth">
+                                <i class="fab fa-twitter-x"></i>&nbsp;Connect Account
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <!-- Claim Modal -->
+    <div class="modal p-4" id="claimModal">
+        <div class="modal-background" onclick="closeClaimModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Claim <span id="pitchName"></span></p>
+                <button class="delete" onclick="closeClaimModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <form method="post" action="{% url 'claim_pitch' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pitch_id" id="pitchId">
+                    
+                    <div class="field">
+                        <label class="label">Verification Method</label>
+                        <div class="control">
+                            <label class="radio">
+                                <input type="radio" name="verification_method" value="email" checked>
+                                Email Verification
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="verification_method" value="x">
+                                X Account Verification
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Your Role</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="role" required>
+                                    <option value="" disabled selected>Select your role</option>
+                                    <option value="founder">Founder</option>
+                                    <option value="ceo">CEO</option>
+                                    <option value="cto">CTO</option>
+                                    <option value="employee">Employee</option>
+                                    <option value="investor">Investor</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Proof of Ownership (Optional)</label>
+                        <div class="control">
+                            <textarea class="textarea" name="proof" placeholder="Links to official profiles, documents, etc."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="field mt-5">
+                        <div class="control">
+                            <button type="submit" class="button is-primary is-fullwidth">
+                                Submit Claim
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+{% endblock  %}
+
+<!-- Footer -->
+<footer class="footer py-5">
+    <div class="container">
+        <div class="content has-text-centered">
+            <p>© {% now "Y" %} Pitchedlink. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+
+<script>
+
+    // Message handling
+    const cancel = document.querySelector('#cancel');
+    const messageContainer = document.querySelector('.messages');
+    
+    let autoRemoveTimer = setTimeout(() => {
+        if (messageContainer) {
+            messageContainer.style.display = 'none';
+        }
+    }, 5000);
+
+    const removeMessage = () => {
+        if (messageContainer) {
+            messageContainer.style.display = 'none';
+        }
+        clearTimeout(autoRemoveTimer);
+    };
+
+    if (cancel) { 
+        cancel.addEventListener('click', removeMessage);
+    }
+    // Navbar burger toggle
+    document.addEventListener('DOMContentLoaded', () => {
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        $navbarBurgers.forEach(el => {
+            el.addEventListener('click', () => {
+                const target = el.dataset.target;
+                const $target = document.getElementById(target);
+                el.classList.toggle('is-active');
+                $target.classList.toggle('is-active');
+            });
+        });
+    });
+
+    // Modal functions
+    function openClaimModal(pitchId, pitchName) {
+        document.getElementById('pitchId').value = pitchId;
+        document.getElementById('pitchName').textContent = pitchName;
+        document.getElementById('claimModal').classList.add('is-active');
+    }
+    
+    function closeClaimModal() {
+        document.getElementById('claimModal').classList.remove('is-active');
+    }
+    
+    function openOnboardingModal() {
+        document.getElementById('onboardingModal').classList.add('is-active');
+    }
+    
+    function closeOnboardingModal() {
+        document.getElementById('onboardingModal').classList.remove('is-active');
+    }
+</script>
+
+</body>
+</html>

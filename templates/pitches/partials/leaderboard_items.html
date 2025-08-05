@@ -1,0 +1,123 @@
+{% for pitch in top_pitches %}
+<div class="leaderboard-card rank-{{ forloop.counter }}">
+  <div class="rank-number">{{ forloop.counter }}</div>
+  
+  <!-- Trophy icon for top 3 only -->
+  {% if forloop.counter <= 3 %}
+  <div class="trophy-icon">
+    {% if forloop.counter == 1 %}
+    <i class="fa-solid fa-trophy fa-2x"></i>
+    {% elif forloop.counter == 2 %}
+    <i class="fa-solid fa-medal fa-2x"></i>
+    {% elif forloop.counter == 3 %}
+    <i class="fa-solid fa-award fa-2x"></i>
+    {% endif %}
+  </div>
+  {% endif %}
+  
+  <div class="card-image">
+    <img src="{{ pitch.banner_url }}" alt="{{ pitch.name }}" 
+         onerror="this.onerror=null; this.src='{% static 'preview.jpg' %}';">
+  </div>
+  
+  <div class="card-content">
+    <div class="card-header">
+      <div class="card-icon">
+        <a href="{% url 'detail' slug=pitch.slug %}" style="display: block; height: 100%;">
+          <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }} icon" 
+               onerror="this.onerror=null; this.src='{% static 'icon.png' %}';">
+        </a>
+      </div>
+      <div class="card-title-container">
+        <h3 class="card-title">
+          <a href="{% url 'detail' slug=pitch.slug %}" style="color: inherit; text-decoration: none;">
+            {{ pitch.name|truncatechars:25 }}
+          </a>
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 2px;">
+          <span class="card-category">
+            {% if pitch.category %}{{ pitch.category }}{% else %}Software{% endif %}
+          </span>
+          {% if pitch.pitch_data and pitch.pitch_data.0.user %}
+          <div style="font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 4px;">
+            <span>by</span>
+            <a href="https://x.com/{{ pitch.pitch_data.0.user.handle }}" 
+               style="color: #2c3e50; font-weight: 500; text-decoration: none;" 
+               target="_blank">
+              {{ pitch.pitch_data.0.user.name }}
+              {% if pitch.pitch_data.0.user.verified %}
+              <i class="fa-solid fa-circle-check" style="color: #1DA1F2; font-size: 0.7em; margin-left: 2px;"></i>
+              {% endif %}
+              <span style="color: #888; margin-left: 2px;">@{{ pitch.pitch_data.0.user.handle }}</span>
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <p class="card-description-right">
+      {% if pitch.description %}
+       {{ pitch.description|truncatechars:280 }}
+       <a href="{% url 'detail' slug=pitch.slug %}" style="color: inherit; text-decoration: none;">Read more</a>
+      {% else %}
+        {{ pitch.title|truncatechars:280 }}
+      {% endif %}
+    </p>
+    
+    <div class="card-badges">
+      {% if pitch.is_featured %}
+      <div class="card-badge featured">
+        <i class="fa-solid fa-star"></i> Featured
+      </div>
+      {% endif %}
+      
+      {% if pitch.is_launched %}
+      <div class="card-badge launched">
+        <i class="fa-solid fa-rocket"></i> Launched
+      </div>
+      {% endif %}
+      
+      {% if pitch.claimed %}
+      <div class="card-badge claimed">
+        <i class="fa-solid fa-check"></i> Claimed
+      </div>
+      {% endif %}
+      
+      {% if pitch.pitch_data and pitch.pitch_data.0.user.verified %}
+      <div class="card-badge verified">
+        <i class="fa-solid fa-badge-check"></i> Verified Source
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="card-footer">
+      <div class="card-stats">
+        <div class="card-stat">
+          <i class="fa-solid fa-fire"></i>
+          <span>{{ pitch.rank }}</span>
+        </div>
+        <div class="card-stat">
+          <i class="fa-solid fa-hands-clapping"></i>
+          <span>{{ pitch.clap }}</span>
+        </div>
+      </div>
+      
+      <div class="card-cta-container">
+        {% if pitch.url %}
+        <a href="{{ pitch.url }}" class="card-cta primary" target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+          Visit Site
+        </a>
+        {% endif %}
+        {% if pitch.slug %}
+        <a href="{% url 'detail' slug=pitch.slug %}" class="card-cta secondary">
+          <i class="fas fa-info-circle"></i>
+          Details
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}

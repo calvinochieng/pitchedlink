@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Information -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} PitchedLink</title>
+    {% load static %}
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
+
+    <meta name="description" content="{% block description %}{% endblock description %}">
+    <meta name="keywords" content="">
+    <meta name="author" content="Calvin Ochieng">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@calvinochieng_">
+    <meta name="twitter:image:alt" content="PitchedLink">
+
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https:/pitchedl.ink">
+    <meta property="og:image:alt" content="PitchedLink">
+    <meta property="og:site_name" content="PitchedLink">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:logo" content=" {% static 'logo.png'%} " />
+        
+
+    
+    {% block meta %} {% endblock meta %}
+
+    <!-- Schema.org (JSON-LD for Rich Results) -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "website",
+          "name": "PitchedLink",
+          "author": {
+            "@type": "Person",
+            "name": "Calvin Ochieng"
+          },
+          "description": "",
+          "image": "{% static 'app/images/logo.png' %}",
+          "url": "https:/pitchedl.ink",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Microsaas Link"
+          },
+          "inLanguage": "en",
+          "datePublished": "2025-2-10"
+        }
+    </script>
+        
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">    
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    {% block custom_styles %}{% endblock custom_styles %}
+    {% comment %} Footer Styles {% endcomment %}
+    <style>
+        
+        :root {
+            --primary-color: #FFB70F;
+            --secondary-color: #0088cc;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --card-bg: #1a1a1a;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 183, 15, 0.3);
+            --launched-badge: #28a745;
+            --featured-badge: #e63946;
+        }
+        .has-text-turquoise {
+            color: #ffb70f !important;
+        }
+        .is-turquoise {
+            background-color: #ffb70f;
+            border-color: transparent;
+            color: #fff;
+        }
+        .footer {
+            background-color: #191919;
+        }
+        .footer-heading {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: block !important;
+        }
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        .footer-links a {
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: #ffb70f !important;
+        }
+        .social-icons a {
+            transition: all 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: #ffb70f !important;
+            transform: translateY(-3px);
+        }
+        .footer-divider {
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 1px;
+            margin: 2rem 0;
+        }
+        .footer-logo {
+            max-height: 40px;
+        }
+        .newsletter-signup .input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .newsletter-signup .input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2N03YDH7HF');
+    </script>
+</head>
+<body>
+     <!-- Navigation Bar -->
+  <nav class="navbar is-warning">
+
+   <div class="container">
+    <div class="navbar-brand">        
+        <a class="navbar-item" href="/">
+          <span class="logo has-text-align-center"> pitched<span class="has-text-white ml-0">link</span></span>
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic" style="color: black;">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="/#features">Features</a>
+          <a class="navbar-item" href="/#how-it-works">How It Works</a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-black is-rounded" href="{% url 'account_signup' %}">
+                <strong>Claim Your Pitch</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+  </nav>
+
+    <!-- Content Section -->
+ 
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+                {{ message }}
+                <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                    <i class="fa fa-times"></i> <!-- Close icon -->
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock content %}
+        
+    <!-- Footer -->
+    <footer class="footer has-background-dark pt-6 pb-4">
+        <div class="container">
+            <div class="columns is-multiline">
+                <!-- Logo and Mission -->
+                <div class="column is-4">
+                    <div class="newsletter-signup">
+                        <p class="has-text-turquoise mb-2"><strong>Get notified if your ptiches are available in your inbox</strong></p>
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input class="input" type="email" placeholder="Your email">
+                            </div>
+                            <div class="control">
+                                <button class="button is-turquoise">Subscribe</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="column is-2">
+                    <h4 class="footer-heading has-text-turquoise mb-4">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}" class="has-text-light">Home</a></li>
+                        <li><a href="{% url 'home' %}#features" class="has-text-light">Features</a></li>
+                        <li><a href="{% url 'home' %}#how-it-works" class="has-text-light">How It Works</a></li>
+                        <li><a href="{% url 'about' %}" class="has-text-light">About Us</a></li>
+                        <li><a href="{% url 'blog' %}" class="has-text-light">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Partner Websites -->
+                <div class="column is-2">
+                    <h4 class="footer-heading has-text-turquoise mb-4">Partners</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://5munlocked.ink/" target="_blank" rel="noopener" class="has-text-light">5MUnlocked</a></li>
+                        <li><a href="https://microsaasl.ink/" target="_blank" rel="noopener" class="has-text-light">Microsaaslink</a></li>
+                        <li><a href="https://yourstartuppitches.onrender.com/" target="_blank" rel="noopener" class="has-text-light">YourStartupPitches</a></li>
+                        <li><a href="https://xtuls.com/" target="_blank" rel="noopener" class="has-text-light">Xtuls</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support & Legal -->
+                <div class="column is-2">
+                    <h4 class="footer-heading has-text-turquoise mb-4">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'terms_of_service' %}" class="has-text-light">Terms of Service</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="has-text-light">Privacy Policy</a></li>
+                        <li><a href="{% url 'refund_policy' %}" class="has-text-light">Refund Policy</a></li>
+                        <li><a href="{% url 'contact' %}" class="has-text-light">Contact Support</a></li>
+                        {% comment %} <li><a href="{% url 'faq' %}" class="has-text-light">FAQ</a></li> {% endcomment %}
+                    </ul>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="column is-2">
+                    <h4 class="footer-heading has-text-turquoise mb-4">Connect</h4>
+                    <div class="social-icons mb-4">
+                        <a href="https://x.com/calvinochieng_" target="_blank" rel="noopener" class="icon is-medium mr-2 has-text-light">
+                            <i class="fab fa-x-twitter fa-lg"></i>
+                        </a>
+                        <a href="https://www.producthunt.com/posts/yourstartuppitches" class="icon is-medium has-text-light">
+                            <i class="fab fa-product-hunt fa-lg"></i>
+                        </a>
+                    </div>
+                    <p class="has-text-grey-light">
+                        <span class="icon is-small mr-1">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <hr class="footer-divider">
+            
+            <!-- Bottom Footer -->
+            <div class="columns is-vcentered mt-5">
+                <div class="column">
+                    <p class="has-text-grey-light">&copy; <span id="year">2025</span> PitchedLink. All rights reserved.</p>
+                </div>
+                <div class="column has-text-right">
+                    <p class="has-text-grey-light is-size-7">
+                        <span class="payment-icons mr-2">
+                            <i class="fab fa-cc-visa fa-lg mr-1"></i>
+                            <i class="fab fa-cc-mastercard fa-lg mr-1"></i>
+                            <i class="fab fa-cc-paypal fa-lg"></i>
+                        </span>
+                        Secure payments by Paddle
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
+    </footer>
+
+    
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'app/scripts.js' %}"></script>
+    
+    <!-- Scroll-based navbar hide/show functionality -->
+    <style>
+        .navbar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .navbar.scrolled {
+            transform: translateY(-100%);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.querySelector('.navbar');
+            let lastScroll = 0;
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll <= 0) {
+                    navbar.classList.remove('scrolled');
+                    return;
+                }
+                
+                if (currentScroll > lastScroll) {
+                    // Scrolling down
+                    navbar.classList.add('scrolled');
+                } else {
+                    // Scrolling up
+                    navbar.classList.remove('scrolled');
+                }
+                
+                lastScroll = currentScroll;
+            });
+        });
+    </script>
+    <script>
+        document.querySelector('.navbar-burger').addEventListener('click', function () {
+            const target = document.getElementById(this.dataset.target);
+            target.classList.toggle('is-active');
+        });
+    </script>
+    <!-- Showing the messages etc -->
+    <script>
+        // Select the cancel button
+        const cancel = document.querySelector('#cancel');
+        const messageContainer = document.querySelector('.messages');
+        
+        // Timer to automatically remove the message after 5 seconds
+        let autoRemoveTimer = setTimeout(() => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000); // 5000ms = 5 seconds
+
+        // Function to manually remove the message
+        const removeMessage = () => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+            clearTimeout(autoRemoveTimer); // Clear the timer to prevent conflicts
+        };
+
+        if (cancel){ cancel.addEventListener('click', removeMessage);}
+    </script>
+    
+    {% block scripts %}{% endblock scripts %}
+        
+</body>
+</html>

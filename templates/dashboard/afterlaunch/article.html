@@ -1,0 +1,170 @@
+{% extends "../dashboard.html" %}
+{% load static %}
+{% block content %}
+
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<style>
+  footer {
+    display: none;
+  }
+
+  input[type="radio"]:checked + .media {
+    border: 2px solid #3273dc;
+    border-radius: 6px;
+    padding: 0.5em;
+  }
+
+  .custom-radio-label {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  label.custom-radio-label:has(input[type="radio"]:checked) {
+    background-color: #ffd83cbf;
+    border-color: #ffd83c;
+  }
+
+  .floater-container {
+    width: 100%;
+  }
+
+  .floater-container form {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .left-scroller {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .toast-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #363636;
+    color: #fff;
+    border-radius: 5px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  #preview-card {
+    background-color: transparent !important;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 6px;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(-50%) translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  }
+</style>
+
+<section class="section p-5">
+  <div class="container">
+    <div class="columns is-variable is-8">
+      
+      <!-- LEFT: Form -->
+      <div class="column is-half">
+        <h1 class="title has-text-centered">📝 SEO Article Writer</h1>
+        <div class="floater-container">
+          <form id="article-form" method="post">
+            {% csrf_token %}
+
+            <!-- Product Selection -->
+            <div class="field">
+              <label class="label" for="pitch_id">Your Product/Tool</label>
+              <p class="help">Select the product/tool you want to write about</p>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="pitch_id" id="pitch_id" required>
+                    <option value="" disabled selected>Select a product/tool…</option>
+                    {% for pitch in claimed_pitches %}
+                      <option value="{{ pitch.id }}">{{ pitch.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <input type="hidden" name="tweet_content" id="tweet_content">  
+            <input type="hidden" name="tweet_url" id="tweet_url">  
+
+            <!-- Extra Ideas -->
+            <div class="field">
+              <label class="label" for="extra_ideas">Additional Ideas</label>
+              <div class="control">
+                <textarea 
+                  name="extra_ideas" 
+                  id="extra_ideas" 
+                  class="textarea" 
+                  rows="3"
+                  placeholder="E.g. highlight a free trial, explain how it solves X, tone, etc."></textarea>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="field mt-5">
+              <div class="control">
+                <button type="submit" class="button is-warning is-fullwidth" id="generate-btn">
+                  <span class="icon"><i class="fas fa-magic"></i></span>
+                  <span>Write Article</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: Output Preview -->
+      <div class="column is-half">
+        <h2 class="subtitle">🧾 Article Preview</h2>
+        <div class="left-scroller">
+          
+          <div class="buttons mt-4">
+            <button class="button is-link" id="copy-article-btn">
+              <span class="icon"><i class="far fa-copy"></i></span>
+              <span>Copy</span>
+            </button>
+            <button class="button is-link" id="export-article-btn">
+              <span class="icon"><i class="far fa-file"></i></span>
+              <span>Export (.txt)</span>
+            </button>
+            <button class="button is-link" id="save-article-btn" data-save-article="">
+              <span class="icon"><i class="far fa-save"></i></span>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <div id="preview-card" class="card-content mt-3" contenteditable="true" style="white-space: pre-wrap;">
+            <em>Generated article will appear here...</em>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Notification -->
+<div id="toast-notification" class="toast-notification has-background-warning has-text-black" style="display:none;">
+  Article copied!
+</div>
+
+{% endblock %}

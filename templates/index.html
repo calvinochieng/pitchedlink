@@ -1,0 +1,662 @@
+{% extends 'base.html' %}
+{% block title %}Pitchedlink - Discover & Rank Early-Stage SaaS Pitches{% endblock title %}
+{% block description %}Track and rank SaaS products shared in "Pitch your startup" threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!{% endblock description %}
+
+{% load static %}
+{% block meta %}
+    <!-- meta seo -->
+    <meta property="og:title" content="Discover the Hottest SaaS Pitches">
+    <meta property="og:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
+    <meta property="og:image" content="{% static 'preview.jpg' %}">
+    
+    <meta name="twitter:title" content="Discover the Hottest SaaS Pitches">
+    <meta name="twitter:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
+    <meta name="twitter:image" content="{% static 'preview.jpg' %}">
+{% endblock meta %}
+
+{% block custom_styles %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #FFB70F 0%, #F5A700 100%);
+        --secondary-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        --primary-color: #FFB70F;
+        --primary-dark: #e69500;
+        --text-dark: #1a1a1a;
+        --text-light: #f8f9fa;
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        --hover-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+    
+    /* Hero Section Improvements */
+    .hero-gradient {
+        /* dark on the left for max contrast, warming to gold on the right */
+        background: linear-gradient(
+            140deg, #f5a700 -37%, /* near‑black for text */
+             #000000 48%, /* dark bronze mid‑tone */
+             #d48b00 70%, /* warm gold */ 
+             #ffb70f 100% /* bright amber highlight */);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      
+    
+    
+    .hero-gradient::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .hero-title {
+        font-weight: 800;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-subtitle {
+        font-weight: 400;
+        line-height: 1.6;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .dark-title {
+        color: var(--text-dark);
+    }
+    
+    /* Claim Form Styling */
+    .claim-form {
+        border-radius: 50px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        max-width: 700px;
+        margin: 2rem auto 0;
+        border: none;
+    }
+    
+    .hero-input {
+        border-radius: 50px 0 0 50px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--text-dark) !important;
+        padding: 1.4rem 2rem;
+        border: none;
+        font-size: 1.1rem;
+    }
+    
+    .hero-input::placeholder {
+        color: rgba(26, 26, 26, 0.7) !important;
+    }
+    
+    .cta-button {
+        border-radius: 0 50px 50px 0;
+        font-weight: 600;
+        background: #000;
+        color: white !important;
+        border: none;
+        padding: 1.4rem 2.5rem;
+        transition: all 0.3s ease;
+        border-radius: 50px;
+        border: 1px solid #ffb70f;
+    }
+    
+    .cta-button:hover {
+        background: var(--text-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Value Propositions */
+    .value-prop {
+        transition: transform 0.3s ease;
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+    }
+    
+    .value-prop:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Card Styling */
+    .feature-card, .pitch-example {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border-radius: 16px;
+        overflow: hidden;
+        height: 100%;
+        border: none;
+        box-shadow: var(--card-shadow);
+        background: rgba(255, 255, 255, 0.98);
+    }
+    
+    .feature-card:hover, .pitch-example:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 183, 15, 0.15);
+        margin: 0 auto 1.5rem;
+    }
+    
+    .feature-icon i {
+        font-size: 1.8rem;
+        color: var(--primary-color);
+    }
+    
+    /* How It Works */
+    .how-it-works-step {
+        position: relative;
+        padding: 2rem;
+        background: #1f2229;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .step-number {
+        position: absolute;
+        left: -15px;
+        top: -15px;
+        background: var(--primary-color);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.4rem;
+        box-shadow: 0 5px 15px rgba(255, 183, 15, 0.3);
+    }
+    
+    /* Testimonials */
+    .testimonial-card {
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .testimonial-card::before {
+        content: """;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 5rem;
+        font-family: Georgia, serif;
+        color: rgba(255, 183, 15, 0.1);
+        line-height: 1;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        background: var(--secondary-gradient);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .cta-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("{% static 'app/images/pattern.png' %}") repeat;
+        opacity: 0.05;
+        pointer-events: none;
+    }
+    
+    /* Animation Utilities */
+    .fade-in {
+        animation: fadeIn 0.8s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    
+    /* Twitter Embed Styling */
+    .twitter-embed-wrapper {
+        border-radius: 20px;
+        overflow: hidden;
+        transform: perspective(1000px) rotateY(-8deg);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transition: transform 0.4s ease;
+        background: white;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .twitter-embed-wrapper:hover {
+        transform: perspective(1000px) rotateY(0);
+    }
+    
+    @media (max-width: 768px) {
+        .twitter-embed-wrapper {
+            transform: none;
+            margin-top: 3rem;
+        }
+    }
+</style>
+{% endblock custom_styles %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero is-medium hero-gradient">
+    <div class="hero-body">
+      <div class="container hero-content" style="max-width:900px;">
+        <div class="columns is-vcentered">
+  
+          <!-- Left: Killer Copy & CTA -->
+          <div class="column is-7">
+            <!-- 1. Short, punchy headline -->
+            <h1 class="title is-1 hero-title fade-in">
+              Your SaaS Pitch Lives On
+            </h1>
+  
+            <!-- 2. Outcome‑focused subhead -->
+            <p class="subtitle is-4 hero-subtitle fade-in delay-1">
+                Get 3× <strong>more clicks & demo requests</strong> long after your SaaS pitch on X fades.
+            </p>
+  
+            <!-- 3. Social proof counter -->
+            <p class="has-text-grey mb-4 fade-in delay-2">
+              ✔️ 1,200 pitches tracked · 300+ founders onboarded
+            </p>
+  
+            <!-- 4. Traction‑first CTA -->
+            <a href="{% url 'claim_pitch' %}" class="control fade-in delay-3">
+              <button class="button is-large cta-button">
+                Get Real Traction →
+              </button>
+            </a>
+  
+            <!-- 5. No‑risk guarantee -->
+            <p class="has-text-grey mt-2 fade-in delay-4">
+              Free · 60‑second setup · No credit card
+            </p>
+          </div>
+  
+          <!-- Right: Contextual Tweet Embed -->
+          <div class="column is-5 fade-in delay-2">
+            <div class="twitter-embed-wrapper">
+              <blockquote class="twitter-tweet">
+                <p lang="en" dir="ltr">
+                  Pitch your startup<br><br>
+                  - Max 5 words<br>
+                  - Link if available<br><br>
+                  👀 Seen by 165k people last month<br>
+                  📈 YES, consider this marketing – GO!
+                </p>
+                &mdash; PL Bompard (@PLBompard)
+                <a href="https://twitter.com/PLBompard/status/1948911290723766719">
+                  July 26, 2025
+                </a>
+              </blockquote>
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+
+<!-- How It Works -->
+<section class="section py-6" id="how-it-works">
+    <div class="container">
+        <div class="has-text-centered mb-6">
+            <h2 class="title is-2 fade-in">How Pitchedlink Works</h2>
+            <p class="subtitle is-5 fade-in delay-1">We track, rank, and showcase SaaS products shared in pitch threads</p>
+        </div>
+        <div class="columns is-vcentered is-multiline">
+            <div class="column is-4 fade-in delay-1">
+                <div class="how-it-works-step">
+                    <div class="step-number">1</div>
+                    <h3 class="title is-4 mt-2">We Discover</h3>
+                    <p class="mt-3">Find SaaS pitches on X (Twitter).</p>
+                    <div class="has-text-centered mt-4">
+                      <span class="icon is-large has-text-primary">
+                          <i class="fas fa-search fa-3x"></i>
+                      </span>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-4 fade-in delay-2">
+                <div class="how-it-works-step">
+                    <div class="step-number">2</div>
+                    <h3 class="title is-4 mt-2">We Rank</h3>
+                    <p class="mt-3">Based on real engagement.</p>
+                    <div class="has-text-centered mt-4">
+                      <span class="icon is-large has-text-primary">
+                          <i class="fas fa-chart-line fa-3x"></i>
+                      </span>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-4 fade-in delay-3">
+                <div class="how-it-works-step">
+                    <div class="step-number">3</div>
+                    <h3 class="title is-4 mt-2">You Get Discovered</h3>
+                    <p class="mt-3">Long-term visibility & traction.</p>
+                    <div class="has-text-centered mt-4">
+                      <span class="icon is-large has-text-primary">
+                          <i class="fas fa-bullhorn fa-3x"></i>
+                      </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Pitches Preview -->
+<section class="section has-background-light py-6">
+    <div class="container">
+        <div class="has-text-centered mb-6">
+            <h2 class="title is-2 dark-title fade-in">New Pitches</h2>
+            <p class="subtitle is-5 dark-title fade-in delay-1">Top-ranked SaaS products from recent pitch threads</p>
+        </div>
+        
+        <div class="columns is-multiline">
+            <!-- Pitch Example 1 -->
+            {% for pitch in top_pitches %}           
+        
+            <div class="column is-4 fade-in" style="position: relative;">
+                <button 
+                style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 1;"
+                class="button is-link" onclick="window.location.href='{{ pitch.url }}'">
+                <i class="fas fa-external-link-alt"></i>
+                </button>
+                <a href="{% url 'detail' slug=pitch.slug %}">
+                    <div class="new-pitch-item card has-background-white">
+                        <img src="{{ pitch.banner_url }}" 
+                        onerror="this.src='/static/preview.jpg';" 
+                        alt="{{ pitch.title }}"
+                        style="width: 100%; height: 150px; object-fit: cover;">
+                        <div class="card-content">
+                            <div class="media mb-4">
+                                <div class="media-content">
+                                <p class="title is-6 mb-0 has-text-black-ter">{{ pitch.title }} </p>
+                                <p class="subtitle is-6 ">by <span class="has-text-black-ter">{{  pitch.pitch_data.0.user.handle }}</span> <span class="tag is-6 is-light">{{ pitch.category.name }}</span></p>
+                                
+                                </div>
+                            </div>  
+                            <div class="level is-mobile">
+                                <div class="level-left">
+                                <div class="level-item">
+                                    <span class="icon has-text-warning">
+                                    <i class="fas fa-bullhorn"></i>
+                                    </span>
+                                    <span>{{ pitch.mention_count }}</span>
+                                </div>
+                                </div>
+                                <div class="level-right">
+                                <div class="tags">
+                                    <span class="">
+                                    <span class="icon">
+                                        <i class="fas fa-gem has-text-danger"></i>
+                                    </span>
+                                    <span>Rank #{{ pitch.rank }}</span>
+                                    </span>
+                                    <span class="">
+                                    <span class="icon">
+                                        <i class="fas fa-hands-clapping has-text-success"></i>
+                                    </span>
+                                    <span>{{ pitch.clap }} Claps</span>
+                                    </span>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="has-text-centered mt-6 fade-in">
+            <a href="{% url 'pitches' %}" class="button is-medium is-dark is-rounded">
+              <strong>Browse All Pitches</strong>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section py-6" id="features">
+    <div class="container">
+        <div class="has-text-centered mb-6">
+            <h2 class="title is-2 fade-in">Why Choose Our PitchedLink?</h2>
+            <p class="subtitle is-5 fade-in delay-1">Experience a smarter way to discover and promote SaaS ideas</p>
+        </div>
+        
+        <div class="columns is-multiline">
+            <!-- Feature 1 -->
+            <div class="column is-4 fade-in">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3 class="title is-4">Real-time Tracking</h3>
+                    <p>We continuously monitor social platforms to find and index new SaaS pitches as they're posted.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="column is-4 fade-in delay-1">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="title is-4">Engagement-based Ranking</h3>
+                    <p>Our algorithm ranks products based on real social engagement, not paid promotions.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="column is-4 fade-in delay-2">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-lock-open"></i>
+                    </div>
+                    <h3 class="title is-4">Free to Claim</h3>
+                    <p>Claim your listing at no cost to enhance visibility and manage your pitch details.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="column is-4 fade-in">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="title is-4">Verified Listings</h3>
+                    <p>Build trust with a verified badge that shows you're the authentic founder.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="column is-4 fade-in delay-1">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-line-chart"></i>
+                    </div>
+                    <h3 class="title is-4">Performance Analytics</h3>
+                    <p>Track views, engagement, and ranking performance for your pitch.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="column is-4 fade-in delay-2">
+                <div class="feature-card box has-text-centered p-5 has-background-black-ter">
+                    <div class="feature-icon">
+                      <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="title is-4">Targeted Exposure</h3>
+                    <p>Reach investors, early adopters, and industry professionals actively seeking new tools.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Claim Section -->
+
+<section class="section py-6" id="why-claim">
+    <div class="container">
+        <div class="cta-section p-6">
+          <div class="columns is-vcentered">
+              <div class="column is-7">
+                  <h2 class="title is-2 has-text-white">Claim Your Spot in the SaaS Hall of Fame</h2>
+                  <p class="subtitle is-5 has-text-white-bis mb-5">Join other indie founders turning quick pitch tweets into long-term traction. Claiming gives you:</p>
+                  <div class="content has-text-white">
+                      <ul class="has-text-white">
+                          <li class="mb-3">
+                            <span class="icon has-text-success">
+                              <i class="fas fa-check-circle"></i>
+                            </span>
+                            <strong>A verified badge</strong> to build trust
+                          </li>
+                          <li class="mb-3">
+                            <span class="icon has-text-success">
+                              <i class="fas fa-check-circle"></i>
+                            </span>
+                            <strong>Analytics</strong> on who’s discovering your product
+                          </li>
+                          <li class="mb-3">
+                            <span class="icon has-text-success">
+                              <i class="fas fa-check-circle"></i>
+                            </span>
+                            <strong>Control</strong> to edit your pitch and boost visibility
+                          </li>
+                          <li class="mb-3">
+                            <span class="icon has-text-success">
+                              <i class="fas fa-check-circle"></i>
+                            </span>
+                            <strong>Appear</strong> in curated SaaS rankings seen by thousands
+                          </li>
+                          <li>
+                            <span class="icon has-text-success">
+                              <i class="fas fa-check-circle"></i>
+                            </span>
+                            <strong>Respond</strong> to feedback and engage with potential users
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="column is-5">
+                  <div class="box p-5 has-text-centered">
+                      <h3 class="title is-4">Claim Your Pitch Now</h3>
+                      <p class="mb-4">Founders only. Free to list.</p>
+                      <a href="{% url 'claim_pitch' %}" class="control">
+                        <button 
+                          type="submit" 
+                          class="button is-warning is-fullwidth mt-4 py-3"
+                          style="border-bottom-right-radius:50px; border-bottom-left-radius:50px"
+                        >
+                          <strong>Claim My Pitch →</strong>
+                        </button>
+                      </a>
+                  </div>
+              </div>
+          </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section py-6">
+    <div class="container">
+        <div class="cta-section p-6">
+          <div class="columns is-vcentered">
+            <div class="column is-8">
+                <h2 class="title is-2 has-text-white">Ready to Make Your SaaS Shine?</h2>
+                <p class="subtitle is-4 has-text-white-bis">Join a growing community of innovators who are putting their SaaS in the spotlight.</p>
+            </div>
+            <div class="column is-4 has-text-right">
+                <a href="{% url 'account_signup' %}" class="button is-rounded is-large is-light">
+                    <strong>Get Started Today</strong>
+                </a>
+            </div>
+          </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  // Add Twitter widget script
+  window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+    return t;
+  }(document, "script", "twitter-wjs"));
+  
+  // Add smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+  
+  // Initialize animations when elements come into view
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+    
+    document.querySelectorAll('.fade-in').forEach(el => {
+      observer.observe(el);
+    });
+  });
+</script>
+{% endblock scripts %}
+

@@ -1,0 +1,130 @@
+{% extends "legal.html" %}
+
+{% block title %} Refund Policy{% endblock title %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="content">
+            <h1 class="title is-2">Refund Policy</h1>
+            <p class="subtitle is-6">Last Updated: March 16, 2025</p>
+
+            <div class="box">
+                <h2 class="title is-5">Table of Contents</h2>
+                <ul class="toc-list">
+                    <li><a href="#eligibility">1. Refund Eligibility</a></li>
+                    <li><a href="#process">2. Refund Process</a></li>
+                    <li><a href="#restrictions">3. Refund Restrictions</a></li>
+                    <li><a href="#trial">4. Free Trial Conversion</a></li>
+                    <li><a href="#contact">5. Contact Information</a></li>
+                </ul>
+            </div>
+
+            <!-- Section 1: Refund Eligibility -->
+            <section id="eligibility">
+                <h2 class="title is-4">1. Refund Eligibility</h2>
+                <p>At MicroSaaSLink, we want you to be completely satisfied with your subscription. We offer refunds under the following conditions:</p>
+                <ul>
+                    <li>You may request a refund within 14 days of your initial purchase.</li>
+                    <li>You must not have used any of our analysis tools or services.</li>
+                    <li>Once you have generated any micro-SaaS ideas or used our platform's analysis features, you become ineligible for a refund.</li>
+                </ul>
+                <div class="notification is-info">
+                    <p><strong>Important:</strong> Refund eligibility is strictly limited to customers who have not utilized our core services. This policy ensures that users cannot consume our valuable insights and then request their money back.</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Refund Process -->
+            <section id="process">
+                <h2 class="title is-4">2. Refund Process</h2>
+                <p>To request a refund, please follow these steps:</p>
+                <ol>
+                    <li>Send an email to <strong>info@microsaasl.ink</strong> with the subject line "Refund Request".</li>
+                    <li>Clearly state the reason for your refund request in your email.</li>
+                    <li>Include the email address associated with your MicroSaaSLink account.</li>
+                </ol>
+                <p>Once we receive your request:</p>
+                <ul>
+                    <li>We will review your account activity to verify eligibility.</li>
+                    <li>We will respond to your request within seven (7) days.</li>
+                    <li>If approved, refunds will be processed to your original payment method.</li>
+                </ul>
+            </section>
+
+            <!-- Section 3: Refund Restrictions -->
+            <section id="restrictions">
+                <h2 class="title is-4">3. Refund Restrictions</h2>
+                <p>Please be aware of the following restrictions to our refund policy:</p>
+                <ul>
+                    <li>You can only request one refund per month.</li>
+                    <li>If you have previously received a refund, you cannot request a second consecutive refund.</li>
+                    <li>We do not offer partial refunds for yearly subscriptions canceled midway through the year.</li>
+                    <li>Refund requests submitted after the 14-day window will not be approved.</li>
+                </ul>
+                <div class="notification is-warning">
+                    <p><strong>Note:</strong> These restrictions are in place to prevent abuse of our refund system and to maintain the quality of our service for all users.</p>
+                </div>
+            </section>
+
+            <!-- Section 4: Free Trial Conversion -->
+            <section id="trial">
+                <h2 class="title is-4">4. Free Trial Conversion</h2>
+                <p>If you cancel your subscription during your initial 14-day free trial period:</p>
+                <ul>
+                    <li>You will automatically be returned to trial status for the remainder of your trial period.</li>
+                    <li>You will maintain access to free trial features until the trial period expires.</li>
+                    <li>No payment will be required during this time.</li>
+                </ul>
+                <p>After your free trial expires, you will need to subscribe to continue using MicroSaaSLink.</p>
+            </section>
+
+            <!-- Section 5: Contact Information -->
+            <section id="contact">
+                <h2 class="title is-4">5. Contact Information</h2>
+                <p>If you have any questions about our refund policy or need assistance with a refund request, please contact us:</p>
+                <ul>
+                    <li>Email: <a href="mailto:info@microsaasl.ink">info@microsaasl.ink</a></li>
+                </ul>
+                <p>Our support team is available to assist you with any questions or concerns regarding your subscription or refund request.</p>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    // Smooth scroll implementation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
+
+    // Highlight current section in TOC
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.toc-list a');
+
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if(window.scrollY >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('has-text-weight-bold');
+            if(link.getAttribute('href').includes(current)) {
+                link.classList.add('has-text-weight-bold');
+            }
+        });
+    });
+</script>
+{% endblock scripts %}

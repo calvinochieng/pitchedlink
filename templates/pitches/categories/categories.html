@@ -1,0 +1,201 @@
+{% extends "pitches/base.html" %}
+{% load static %}
+
+{% block title %}Categories | PitchedLink{% endblock %}
+
+{% block description %}Browse all startup categories on PitchedLink. Discover innovative products and services across different industries and sectors.{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Browse all startup categories on PitchedLink. Discover innovative products and services across different industries and sectors.">
+    <meta property="og:title" content="Startup Categories | PitchedLink">
+    <meta property="og:description" content="Browse all startup categories on PitchedLink. Discover innovative products and services across different industries.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Startup Categories | PitchedLink">
+    <meta name="twitter:description" content="Discover innovative startups across various categories on PitchedLink.">
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="category-header mb-6">
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li class="is-active"><a href="#" aria-current="page">Categories</a></li>
+                </ul>
+            </nav>
+            
+            <div class="is-flex is-justify-content-space-between is-align-items-center mb-5">
+                <div>
+                    <h1 class="title is-2 has-text-weight-bold">All Categories</h1>
+                    <p class="subtitle is-5 has-text-grey">Browse startups by category</p>
+                </div>
+                <div class="category-actions">
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" placeholder="Search categories..." id="categorySearch">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'category_detail' slug=category.slug %}" class="category-card">
+                <div class="category-icon">
+                    <i class="fas {{ category.icon|default:'fa-folder' }}"></i>
+                </div>
+                <div class="category-info">
+                    <h3 class="title is-4">{{ category.name }}</h3>
+                    <p class="subtitle is-6">{{ category.pitch_count|default:'0' }} {% if category.pitch_count == 1 %}pitch{% else %}pitches{% endif %}</p>
+                </div>
+                <div class="category-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+            {% empty %}
+            <div class="column is-12">
+                <div class="notification is-light">
+                    <p>No categories found.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <nav class="pagination is-centered mt-6" role="navigation" aria-label="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="pagination-previous">Previous</a>
+            {% else %}
+                <a class="pagination-previous" disabled>Previous</a>
+            {% endif %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="pagination-next">Next</a>
+            {% else %}
+                <a class="pagination-next" disabled>Next</a>
+            {% endif %}
+            
+            <ul class="pagination-list">
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li><a class="pagination-link is-current" aria-label="Page {{ num }}" aria-current="page">{{ num }}</a></li>
+                    {% else %}
+                        <li><a href="?page={{ num }}" class="pagination-link" aria-label="Goto page {{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .category-header {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+    
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .category-card {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        background: var(--card-bg);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+    
+    .category-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+    
+    .category-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(255, 183, 15, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+    
+    .category-info {
+        flex: 1;
+    }
+    
+    .category-info .title {
+        margin-bottom: 0.25rem;
+        color: var(--text-color);
+    }
+    
+    .category-info .subtitle {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .category-arrow {
+        color: var(--text-light);
+        margin-left: 1rem;
+        transition: transform 0.2s ease;
+    }
+    
+    .category-card:hover .category-arrow {
+        transform: translateX(3px);
+        color: var(--primary-color);
+    }
+    
+    @media (max-width: 768px) {
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .category-actions {
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('categorySearch');
+        const categoryCards = document.querySelectorAll('.category-card');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                categoryCards.forEach(card => {
+                    const title = card.querySelector('.title').textContent.toLowerCase();
+                    if (title.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

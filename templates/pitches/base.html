@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Information -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} PitchedLink</title>
+    {% load static %}
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
+
+    <meta name="description" content="{% block description %}{% endblock description %}">
+    <meta name="keywords" content="">
+    <meta name="author" content="Calvin Ochieng">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@calvinochieng_">
+    <meta name="twitter:image:alt" content="PitchedLink">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pitchedl.ink">
+    <meta property="og:image:alt" content="PitchedLink">
+    <meta property="og:site_name" content="PitchedLink">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:logo" content=" {% static 'logo.png'%} " />
+
+    {% block meta %} {% endblock meta %}
+
+    <!-- Schema.org (JSON-LD for Rich Results) -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "website",
+          "name": "PitchedLink",
+          "author": {
+            "@type": "Person",
+            "name": "Calvin Ochieng"
+          },
+          "description": "",
+          "image": "{% static 'app/images/PitchedLink.png' %}",
+          "url": "https:/yourpitchesl.ink",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Microsaas Link"
+          },
+          "inLanguage": "en",
+          "datePublished": "2025-2-10"
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">    
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    {% block custom_styles %}{% endblock custom_styles %}
+
+    <style>
+        :root {
+            --primary-color: #FFB70F;
+            --secondary-color: #0088cc;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --text-light: #333333;
+            --text-muted: rgba(0, 0, 0, 0.6);
+            --card-bg: #ffffff;
+            --border-light: rgba(0, 0, 0, 0.1);
+            --border-hover: rgba(255, 183, 15, 0.5);
+            --launched-badge: #28a745;
+            --featured-badge: #e63946;
+            --background-color: #ffffff;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #333333;
+            --navbar-border: rgba(255, 183, 15, 0.3);
+            --navbar-shadow: 0 0 20px rgba(255, 183, 15, 0.4),
+                            0 0 40px rgba(255, 183, 15, 0.15),
+                            0 8px 32px rgba(0, 0, 0, 0.2);
+            --navbar-hover-shadow: 0 0 30px rgba(255, 183, 15, 0.6),
+                                0 0 60px rgba(255, 183, 15, 0.25),
+                                0 15px 50px rgba(0, 0, 0, 0.25);
+        }
+                
+        /* Common navbar styles */
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            width: 100%;
+            border-radius: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .navbar-brand .navbar-item span {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand .navbar-item span>span {
+            color: var(--text-light) !important;
+            opacity: 0.8;
+        }
+
+        .navbar-burger {
+            color: var(--text-light) !important;
+        }
+
+        .navbar-menu, .navbar-link {
+            background-color: transparent !important;
+        }
+
+        @media screen and (max-width: 1023px) {
+            .navbar-menu {
+                background-color: #ffffff !important;
+                border: 1px solid rgba(0, 0, 0, 0.1) !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+                border-radius: 8px !important;
+                margin-top: 0.5rem !important;
+            }
+            
+            .navbar-menu .navbar-item,
+            .navbar-menu .navbar-link {
+                color: #333333 !important;
+                padding: 0.75rem 1.5rem !important;
+            }
+            
+            .navbar-menu .navbar-item:hover,
+            .navbar-menu .navbar-link:hover {
+                background-color: rgba(255, 183, 15, 0.1) !important;
+                color: var(--primary-color) !important;
+            }
+        }
+
+            .navbar-item {
+                color: var(--text-color) !important;
+                transition: all 0.2s ease;
+            }
+
+            .navbar-item:hover {
+                background-color: rgba(255, 215, 0, 0.15) !important;
+                color: var(--primary-color) !important;
+                transform: translateY(-1px);
+                transition: all 0.2s ease-in-out;
+            }
+
+            .navbar-item.is-active {
+                background-color: rgba(255, 183, 15, 0.15) !important;
+                color: var(--primary-color) !important;
+            }
+
+            .navbar-item i {
+                margin-right: 8px;
+            }
+
+            .navbar-dropdown {
+                background-color: #ffffff !important;
+                border: 1px solid rgba(0, 0, 0, 0.1) !important;
+                {% comment %} box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important; {% endcomment %}
+                padding: 0.5rem 0 !important;
+            }
+
+            .navbar-dropdown .navbar-item:not(.is-active,.is-selected) {
+                color: #333333 !important;
+                background: transparent !important;
+                padding: 0.5rem 1.5rem !important;
+                font-size: 0.95rem !important;
+                transition: all 0.2s ease !important;
+                white-space: nowrap !important;
+            }
+
+            .navbar-dropdown .navbar-item:not(.is-active,.is-selected):hover {
+                background-color: rgba(255, 183, 15, 0.1) !important;
+                color: var(--primary-color) !important;
+                transform: translateX(4px) !important;
+            }
+
+            /* Ensure active/selected states are also styled */
+            .navbar-dropdown .navbar-item.is-active,
+            .navbar-dropdown .navbar-item.is-selected {
+                background-color: rgba(255, 183, 15, 0.15) !important;
+                color: var(--primary-color) !important;
+            }
+
+            .navbar-link:not(.is-arrowless)::after {
+                border-color: #333333 !important;
+                transition: border-color 0.2s ease !important;
+            }
+
+            .navbar-link:hover:not(.is-arrowless)::after,
+            .navbar-link:hover::after {
+                border-color: var(--primary-color) !important;
+            }
+
+   
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-2N03YDH7HF');
+    </script>
+</head>
+<body style="background-color: var(--background-color); color: var(--text-color);">
+  
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="container">
+          <div class="navbar-brand">
+              <a href="{% url 'index' %}" class="navbar-item">
+                {% if is_mobile %}
+                    {% if current_page == 'index' %}
+                        <span>pitched<span>link</span></span>
+                    {% elif current_page == 'pitches' %}
+                    <div class="is-flex is-align-items-center"> <i class="fas fa-arrow-left has-text-warning"></i> <span style="text-transform: capitalize; font-weight: 700; font-size: 1.5rem; color: #333333 !important"> Pitches Archive</span></div>
+                        
+                     {% else %}
+                        <div class="is-flex is-align-items-center"> <i class="fas fa-arrow-left has-text-warning"></i> <span style="text-transform: capitalize; font-weight: 700; font-size: 1.5rem; color: #333333 !important"> {{current_page}}</span></div>
+                    {% endif %}
+                    {% else %}
+                    <span>pitched<span>link</span></span>
+                {% endif %}
+              </a>
+    
+              <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+              </a>
+          </div>
+    
+          <div id="navbarMain" class="navbar-menu">
+              <div class="navbar-start">
+                  <a href="{% url 'home' %}" class="navbar-item {% if current_page == 'home' %}is-active{% endif %}">
+                      Home
+                  </a>
+                  {% if request.user.is_authenticated %}
+                  <a href="{% url 'dashboard' %}" class="navbar-item {% if current_page == 'dashboard' %}is-active{% endif %}">
+                      Dashboard
+                  </a>
+                  {% endif %}
+    
+                  <a href="{% url 'leaderboard' %}" class="navbar-item {% if current_page == 'leaderboard' %}is-active{% endif %}">
+                      Leaderboard
+                  </a>
+    
+                  <a href="{% url 'pitches' %}" class="navbar-item {% if current_page == 'pitches' %}is-active{% endif %}">             
+                      Pitches
+                  </a>
+    
+                  <div class="navbar-item has-dropdown is-hoverable">
+                      <div class="navbar-link">               
+                          <a href="{% url 'categories' %}" style="color: #333333 !important;">Categories</a>
+                      </div>
+                      <div class="navbar-dropdown">
+                          {% for category in categories %}
+                          <a href="{% url 'category_detail' category.slug %}" class="navbar-item">
+                              {{ category.name }}
+                          </a>
+                          {% endfor %}
+                      </div>
+                  </div>
+              </div>
+    
+              <div class="navbar-end">
+                  <div class="navbar-item">
+                      <div class="buttons">
+                          <a href="{% url 'claim_pitch' %}" class="button is-warning is-rounded">
+                              <i class="fa-solid fa-bullhorn"></i>
+                              <span>Pitch SaaS</span>
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </nav>
+
+    <!-- Content Section -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+                {{ message }}
+                <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                    <i class="fa fa-times"></i>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock content %}
+    
+
+    <footer class="footer">
+        <div class="content">
+            <p>&copy; <span id="year"></span> PitchedLink. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+
+        // Message handling
+        const cancel = document.querySelector('#cancel');
+        const messageContainer = document.querySelector('.messages');
+        
+        let autoRemoveTimer = setTimeout(() => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000);
+
+        const removeMessage = () => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+            clearTimeout(autoRemoveTimer);
+        };
+
+        if (cancel) { 
+            cancel.addEventListener('click', removeMessage);
+        }
+
+        // Standard navbar functionality
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+                });
+            });
+
+            const $navbarItems = Array.prototype.slice.call(document.querySelectorAll('.navbar-item'), 0);
+            $navbarItems.forEach(el => {
+                el.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) {
+                        const $navbarBurger = document.querySelector('.navbar-burger');
+                        const $navbarMenu = document.querySelector('.navbar-menu');
+                        
+                        if ($navbarBurger && $navbarBurger.classList.contains('is-active')) {
+                            $navbarBurger.classList.remove('is-active');
+                            $navbarMenu.classList.remove('is-active');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Universal Clap Functionality -->
+    <script>
+        // Global clap function
+        async function clapPitch(button) {
+            const slug = button.dataset.slug;
+            const clapCountElement = button.querySelector('.clap-count');
+            const rankElement = document.querySelector(`.pitch-rank[data-slug="${slug}"]`);
+            
+            if (!slug) {
+                console.error('No slug found for clap button');
+                return;
+            }
+
+            try {
+                // Add loading state
+                button.classList.add('is-loading');
+                button.disabled = true;
+                
+                const response = await fetch(`/clap_pitch/${slug}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update clap count
+                    if (clapCountElement) {
+                        clapCountElement.textContent = data.new_count;
+                        // Add animation
+                        clapCountElement.classList.add('has-text-success');
+                        setTimeout(() => clapCountElement.classList.remove('has-text-success'), 1000);
+                    }
+                    
+                    // Update rank if element exists
+                    if (rankElement) {
+                        rankElement.textContent = data.new_rank;
+                        rankElement.classList.add('has-text-weight-bold');
+                        setTimeout(() => rankElement.classList.remove('has-text-weight-bold'), 1000);
+                    }
+                    
+                    // Visual feedback
+                    const icon = button.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-hands-clapping');
+                        icon.classList.add('fa-check');
+                        setTimeout(() => {
+                            icon.classList.remove('fa-check');
+                            icon.classList.add('fa-hands-clapping');
+                        }, 1000);
+                    }
+                } else {
+                    throw new Error(data.error || 'Failed to clap');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Show error feedback
+                button.classList.add('has-text-danger');
+                setTimeout(() => button.classList.remove('has-text-danger'), 2000);
+            } finally {
+                button.classList.remove('is-loading');
+                button.disabled = false;
+            }
+        }
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Initialize clap buttons on page load and for dynamically added content
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event delegation for dynamically added buttons
+            document.body.addEventListener('click', function(e) {
+                const clapButton = e.target.closest('.clap-button');
+                if (clapButton) {
+                    e.preventDefault();
+                    clapPitch(clapButton);
+                }
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock scripts %}
+</body>
+</html>

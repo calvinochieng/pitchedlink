@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add/Update Pitches - Pitch Manager</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Primary Brand Colors - Refined gold tone */
+            --primary-color: #F5B30C;        /* Brighter, more vibrant gold */
+            --primary-dark: #D99000;         /* Slightly more saturated dark gold */
+            --primary-light: #FFD166;        /* Light gold for subtle accents */
+            
+            /* Text Colors */
+            --text-light: #FFFFFF;           /* Pure white for better contrast */
+            --text-secondary: #B8B8B8;       /* Secondary text for less important content */
+            
+            /* Background Colors */
+            --dark-bg: #121212;              /* Deeper black for main background */
+            --card-bg: #1E1E1E;              /* Slightly lighter for cards */
+            --card-hover: #2A2A2A;           /* Hover state for cards */
+            
+            /* Border Colors */
+            --border-light: rgba(255, 211, 102, 0.15);  /* Light gold border */
+            --border-hover: rgba(245, 179, 12, 0.6);    /* More visible hover border */
+            
+            /* Gradients */
+            --gradient-dark: linear-gradient(45deg, #191919, #282828);
+            --gradient-accent: linear-gradient(120deg, #F5B30C, #EC9F0E);
+            
+            /* Status Colors */
+            --success: #4CAF50;              /* Green for success states */
+            --error: #F44336;                /* Red for errors */
+            --info: #2196F3;                 /* Blue for information */
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .navbar-brand .navbar-item {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-item {
+            color: var(--text-light) !important;
+        }
+
+        .navbar-item:hover {
+            background-color: var(--card-hover) !important;
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background: var(--gradient-accent);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .card-header-title {
+            color: var(--dark-bg);
+            font-weight: 700;
+        }
+
+        .card-content {
+            color: var(--text-light);
+        }
+
+        .input, .textarea, .select select {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-light);
+        }
+
+        .input:focus, .textarea:focus, .select select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.125em rgba(245, 179, 12, 0.25);
+        }
+
+        .button.is-primary {
+            background: var(--gradient-accent);
+            border: none;
+            color: var(--dark-bg);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .button.is-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(245, 179, 12, 0.4);
+        }
+
+        .notification.is-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .notification.is-danger {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .stats-card {
+            background: var(--gradient-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stats-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .pitch-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .pitch-item:hover {
+            border-color: var(--border-hover);
+            background-color: var(--card-hover);
+        }
+
+        .pitch-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .pitch-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pitch-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .tag {
+            background-color: var(--card-hover);
+            color: var(--text-light);
+            border: 1px solid var(--border-light);
+        }
+
+        .tag.is-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .tag.is-info {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .tag.is-warning {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+        }
+
+        .help {
+            color: var(--text-secondary);
+        }
+
+        .section {
+            padding: 2rem 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 1rem;
+            }
+            
+            .columns {
+                margin: 0;
+            }
+            
+            .column {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'home' %}">
+                <i class="fas fa-bullhorn"></i>
+                <span class="ml-2">Pitch Manager</span>
+            </a>
+        </div>
+
+        <div class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="{% url 'home' %}">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a class="navbar-item" href="#">
+                    <i class="fas fa-chart-line mr-2"></i>Analytics
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                {% if user.is_authenticated %}
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            <i class="fas fa-user mr-2"></i>{{ user.username }}
+                        </a>
+                        <div class="navbar-dropdown">
+                            <hr class="navbar-divider">
+                            <a class="navbar-item" href="{% url 'account_logout' %}">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            <a class="button is-primary" href="{% url 'login' %}">
+                                <strong>Login</strong>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="has-text-centered mb-6">
+                <h1 class="title is-2 has-text-light">
+                    <i class="fas fa-plus-circle mr-3"></i>Add/Update Pitches
+                </h1>
+                <p class="subtitle is-5 has-text-grey-light">
+                    Process pitch data with automated categorization and metadata extraction
+                </p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="notification is-{{ message.tags }} mb-4">
+                        <button class="delete" onclick="this.parentElement.style.display='none'"></button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Error Display -->
+            {% if error %}
+                <div class="notification is-danger mb-4">
+                    <button class="delete" onclick="this.parentElement.style.display='none'"></button>
+                    <strong>Error:</strong> {{ error }}
+                </div>
+            {% endif %}
+
+            <!-- Statistics -->
+            {% if created_count > 0 or updated_count > 0 %}
+                <div class="columns is-multiline mb-6">
+                    <div class="column is-6">
+                        <div class="stats-card">
+                            <span class="stats-number">{{ created_count }}</span>
+                            <span class="stats-label">New Pitches Created</span>
+                        </div>
+                    </div>
+                    <div class="column is-6">
+                        <div class="stats-card">
+                            <span class="stats-number">{{ updated_count }}</span>
+                            <span class="stats-label">Pitches Updated</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="columns">
+                <!-- Form Column -->
+                <div class="column is-4">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-upload mr-2"></i>Pitch Data Input
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="field">
+                                    <label class="label has-text-light">Pitch JSON Data</label>
+                                    <div class="control">
+                                        <textarea 
+                                            class="textarea" 
+                                            name="pitch_json" 
+                                            rows="12" 
+                                            placeholder="Paste your pitch JSON data here..."
+                                            required>{{ pitch_json }}</textarea>
+                                    </div>
+                                    <p class="help">
+                                        Expected format: Array of pitch objects with links, engagement data, etc.
+                                    </p>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary is-fullwidth">
+                                            <i class="fas fa-cogs mr-2"></i>Process Pitches
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Column -->
+                <div class="column is-8">
+                    {% if created_pitches or updated_pitches %}
+                        
+                        <!-- New Pitches Section -->
+                        {% if created_pitches %}
+                            <div class="card mb-4">
+                                <header class="card-header">
+                                    <p class="card-header-title">
+                                        <i class="fas fa-plus mr-2"></i>New Pitches Created ({{ created_pitches|length }})
+                                    </p>
+                                </header>
+                                <div class="card-content">
+                                    {% for pitch in created_pitches %}
+                                        <div class="pitch-item">
+                                            <div class="level">
+                                                <div class="level-left">
+                                                    <div class="level-item">
+                                                        <div>
+                                                            <div class="pitch-title">
+                                                                <a href="{{ pitch.url }}" target="_blank" class="has-text-warning">
+                                                                    {{ pitch.name|default:"Untitled Pitch" }}
+                                                                    <i class="fas fa-external-link-alt ml-1 is-size-7"></i>
+                                                                </a>
+                                                            </div>
+                                                            {% if pitch.description %}
+                                                                <div class="pitch-description">
+                                                                    {{ pitch.description|truncatewords:20 }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="level-right">
+                                                    <div class="level-item">
+                                                        <span class="tag is-success">
+                                                            <i class="fas fa-plus mr-1"></i>New
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="pitch-meta">
+                                                {% if pitch.category %}
+                                                    <span class="tag">
+                                                        <i class="fas fa-folder mr-1"></i>{{ pitch.category }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if pitch.pitch_data %}
+                                                    <span class="tag">
+                                                        <i class="fas fa-comments mr-1"></i>{{ pitch.pitch_data|length }} mention{{ pitch.pitch_data|length|pluralize }}
+                                                    </span>
+                                                {% endif %}
+                                                <span class="tag">
+                                                    <i class="fas fa-clock mr-1"></i>{{ pitch.created_at|date:"M d, Y" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Updated Pitches Section -->
+                        {% if updated_pitches %}
+                            <div class="card">
+                                <header class="card-header">
+                                    <p class="card-header-title">
+                                        <i class="fas fa-sync mr-2"></i>Updated Pitches ({{ updated_pitches|length }})
+                                    </p>
+                                </header>
+                                <div class="card-content">
+                                    {% for pitch in updated_pitches %}
+                                        <div class="pitch-item">
+                                            <div class="level">
+                                                <div class="level-left">
+                                                    <div class="level-item">
+                                                        <div>
+                                                            <div class="pitch-title">
+                                                                <a href="{{ pitch.url }}" target="_blank" class="has-text-warning">
+                                                                    {{ pitch.name|default:"Untitled Pitch" }}
+                                                                    <i class="fas fa-external-link-alt ml-1 is-size-7"></i>
+                                                                </a>
+                                                            </div>
+                                                            {% if pitch.description %}
+                                                                <div class="pitch-description">
+                                                                    {{ pitch.description|truncatewords:20 }}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="level-right">
+                                                    <div class="level-item">
+                                                        <span class="tag is-info">
+                                                            <i class="fas fa-sync mr-1"></i>Updated
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="pitch-meta">
+                                                {% if pitch.category %}
+                                                    <span class="tag">
+                                                        <i class="fas fa-folder mr-1"></i>{{ pitch.category }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if pitch.pitch_data %}
+                                                    <span class="tag">
+                                                        <i class="fas fa-comments mr-1"></i>{{ pitch.pitch_data|length }} mention{{ pitch.pitch_data|length|pluralize }}
+                                                    </span>
+                                                {% endif %}
+                                                <span class="tag">
+                                                    <i class="fas fa-clock mr-1"></i>Updated {{ pitch.updated_at|date:"M d, Y" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="card">
+                            <div class="card-content has-text-centered">
+                                <div class="content">
+                                    <i class="fas fa-inbox fa-3x mb-4" style="color: var(--text-secondary);"></i>
+                                    <h3 class="title is-4 has-text-light">No Pitches Processed Yet</h3>
+                                    <p class="subtitle is-6 has-text-grey-light">
+                                        Enter your pitch JSON data in the form to get started
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Auto-resize textarea
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('textarea[name="pitch_json"]');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            }
+        });
+
+        // Auto-hide notifications after 5 seconds
+        document.querySelectorAll('.notification').forEach(function(notification) {
+            setTimeout(function() {
+                notification.style.opacity = '0';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 300);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

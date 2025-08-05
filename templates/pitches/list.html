@@ -1,0 +1,66 @@
+{% extends "./base.html" %}
+
+{% block title %}SaaS Pitch Directory | Discover & Launch{% endblock %}
+{% load static %}
+
+{% block custom_styles %}
+<style>
+  :root {
+    /* Primary Brand Colors - Refined gold tone */
+    --primary-color: #F5B30C;        /* Brighter, more vibrant gold */
+    --primary-dark: #D99000;         /* Slightly more saturated dark gold */
+    --primary-light: #FFD166;        /* Light gold for subtle accents */
+    
+    /* Text Colors */
+    --text-light: #FFFFFF;           /* Pure white for better contrast */
+    --text-secondary: #B8B8B8;       /* Secondary text for less important content */
+    
+    /* Background Colors */
+    --dark-bg: #121212;              /* Deeper black for main background */
+    --card-bg: #1E1E1E;              /* Slightly lighter for cards */
+    --card-hover: #2A2A2A;           /* Hover state for cards */
+    
+    /* Border Colors */
+    --border-light: rgba(255, 211, 102, 0.15);  /* Light gold border */
+    --border-hover: rgba(245, 179, 12, 0.6);    /* More visible hover border */
+    
+    /* Gradients */
+    --gradient-dark: linear-gradient(45deg, #191919, #282828);
+    --gradient-accent: linear-gradient(120deg, #F5B30C, #EC9F0E);
+    
+    /* Status Colors */
+    --success: #4CAF50;              /* Green for success states */
+    --error: #F44336;                /* Red for errors */
+    --info: #2196F3;                 /* Blue for information */
+  }
+
+  body {
+    overflow: hidden;
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .app-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+  }
+  
+</style>
+{% endblock custom_styles %}
+
+{% block content %}
+<div class="app-container">  
+  <!-- Main Content -->
+   {% include "./main-content.html" %}
+  
+  <!-- Right Sidebar - Leaderboard (Hidden on mobile) -->
+   {% if not is_mobile %}
+    {% include "./right-sidebar.html" %}
+   {% endif %}
+</div>
+
+
+
+{% endblock %}

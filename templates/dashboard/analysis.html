@@ -1,0 +1,38 @@
+<!-- dashboard/templates/dashboard/analysis.html -->
+{% extends 'base.html' %}
+
+
+{% block custom_styles %}
+	<style type="text/css">
+		footer, nav{ display:none !important; }
+	</style>
+{% endblock custom_styles %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <!-- Analysis Form Column -->
+            <div class="column is-4">
+                {% include 'dashboard/analysis_form.html' %}
+            </div>
+            
+            <!-- Analysis Results Column -->
+            <div class="column is-8">
+                {% if analysis_data %}
+                    {% include 'dashboard/analysis_results.html' %}
+                {% elif not form_errors %}
+                    <div class="box">
+                        <div class="content has-text-centered">
+                            <span class="icon is-large">
+                                <i class="fas fa-search fa-3x"></i>
+                            </span>
+                            <p class="mt-4">Enter a SaaS product's details to start the analysis</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

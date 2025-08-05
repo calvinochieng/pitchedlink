@@ -1,0 +1,321 @@
+{% load static %}
+<style>
+    
+  /* Left sidebar styles */
+  .left-sidebar {
+    height: 100vh;
+    width: 70px;
+    background-color: #0f0f0f;
+    padding: 20px;
+    padding-top: 0;
+    overflow-y: auto;
+    height: 100%;
+    flex-shrink: 0;
+    border-right: 1px solid rgba(255, 183, 15, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 10px 0;
+    padding-left: 5px;
+  }
+  .sidebar-logo i, .sidebar-logo-text i {
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  .sidebar-logo img {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .sidebar-logo-text {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    padding: 0 10px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .sidebar-logo-text span {
+    color: var(--text-light);
+    opacity: 0.8;
+  }
+  
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    padding: 12px 8px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;    
+  }
+  
+  .menu-item span {
+    display: none; 
+    opacity: 0; 
+    transition: opacity 0.2s ease;
+  }
+  
+  .menu-item.active {
+    background-color: rgba(255, 183, 15, 0.15);
+    color: var(--primary-color);
+  }
+  
+  .menu-item:hover {
+    background-color: #ffd70054;
+  }
+  
+  .menu-item i {
+    margin-right: 0;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    transition: margin 0.3s ease;
+  }
+  
+  .menu-section {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 0 16px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .sidebar-footer {
+    color: grey;
+    font-size: 0.8rem;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Dropdown Styles */
+  .dropdown-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    margin-left: 20px;
+  }
+  
+  .dropdown-menu.is-active {
+    max-height: 300px;
+  }
+  
+  .dropdown-menu .menu-item {
+    padding-left: 20px;
+    font-size: 0.9em;
+    margin-bottom: 4px;
+  }
+  
+  .dropdown-trigger {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .dropdown-trigger i.fa-chevron-down {
+    transition: transform 0.3s ease;
+  }
+  
+  .dropdown-trigger.is-active i.fa-chevron-down {
+    transform: rotate(180deg);
+  }
+
+  /* Expanded state styles */
+  .left-sidebar.expanded {
+    width: 240px;
+  }
+  
+  .left-sidebar.expanded .menu-item {
+    justify-content: flex-start;
+    padding: 12px 16px;
+    padding-left: 5px;
+  }
+  
+  .left-sidebar.expanded .menu-item i {
+    margin-right: 12px;
+  }
+  
+  .left-sidebar.expanded .sidebar-logo-text {
+    display: block;
+    opacity: 1;
+  }
+  
+  .left-sidebar.expanded .menu-item span {
+    display: inline;
+    opacity: 1;
+  }
+  
+  .left-sidebar.expanded .menu-section {
+    display: block;
+    opacity: 1;
+  }
+  
+  .left-sidebar.expanded .sidebar-footer {
+    display: block;
+    opacity: 1;
+  }
+
+</style>
+<div class="left-sidebar">
+    <div class="sidebar-logo">
+      <i class="fas fa-circle-chevron-right is-5" id="toggle-menu"></i>     
+      <a href="{% url "index" %}" class="sidebar-logo-text">pitched<span>link</span></a>
+    </div>
+    
+    {% if request.user.is_authenticated %}
+    <a href="{% url "dashboard" %}" class="menu-item">
+      <i class="fa-solid fa-cog"></i>
+      <span>Dashboard</span>
+    </a>
+    {% endif %}
+    
+    <a href="#" class="menu-item">
+      <i class="fa-solid fa-fire"></i>
+      <span>Featured Pitches</span>
+    </a>
+    
+    <!-- Leaderboard dropdown menu -->
+    <a href="{% url "leaderboard" %}" class="menu-item">      
+      <i class="fa-solid fa-trophy"></i>
+      <span>Leaderboard</span>
+    </a>    
+    
+    <a href="#" class="menu-item">
+      <i class="fa-solid fa-star"></i>
+      <span>New Pitches</span>
+    </a>
+    
+    <div class="menu-section">More</div>
+    
+    <a href="{% url "home" %}" class="menu-item">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+
+    <div class="menu-item">
+      <a href="{% url 'claim_pitch' %}" class="button is-warning is-rounded">
+        <i class="fa-solid fa-bullhorn"></i>
+        <span>Pitch SaaS</span>
+      </a>
+    </div>
+    
+    <div class="sidebar-footer">
+      &copy; <span id="year"></span> PitchedLink. All rights reserved.
+    </div>
+</div>
+<script>  
+  // Get the toggle button
+  const toggleBtn = document.getElementById('toggle-menu');
+  const leftSidebar = document.querySelector('.left-sidebar');
+  let sidebarCollapsed = true; // Start collapsed
+  
+  // Toggle sidebar function
+  toggleBtn.addEventListener('click', function() {
+    sidebarCollapsed = !sidebarCollapsed;
+    
+    if (sidebarCollapsed) {
+      // Collapse sidebar
+      leftSidebar.classList.remove('expanded');
+      
+      // Change width with transition
+      leftSidebar.style.width = '70px';
+      
+      // Use setTimeout to allow width transition to start before hiding elements
+      setTimeout(() => {
+        // Hide elements with opacity first for smooth transition
+        document.querySelectorAll('.menu-item span').forEach(span => {
+          span.style.opacity = '0';
+        });
+        document.querySelector('.sidebar-logo-text').style.opacity = '0';
+        document.querySelectorAll('.menu-section').forEach(section => {
+          section.style.opacity = '0';
+        });
+        document.querySelector('.sidebar-footer').style.opacity = '0';
+        
+        // After opacity transition, set display none
+        setTimeout(() => {
+          document.querySelectorAll('.menu-item span').forEach(span => {
+            span.style.display = 'none';
+          });
+          document.querySelector('.sidebar-logo-text').style.display = 'none';
+          document.querySelectorAll('.menu-section').forEach(section => {
+            section.style.display = 'none';
+          });
+          document.querySelector('.sidebar-footer').style.display = 'none';
+        }, 200);
+      }, 50);
+      
+      // Change icon to expand/right arrow
+      toggleBtn.className = "fas fa-circle-chevron-right";
+    } else {
+      // Expand sidebar
+      leftSidebar.classList.add('expanded');
+      
+      // Set display to block but opacity 0 first
+      document.querySelectorAll('.menu-item span').forEach(span => {
+        span.style.display = 'inline';
+        span.style.opacity = '0';
+      });
+      document.querySelector('.sidebar-logo-text').style.display = 'block';
+      document.querySelector('.sidebar-logo-text').style.opacity = '0';
+      document.querySelectorAll('.menu-section').forEach(section => {
+        section.style.display = 'block';
+        section.style.opacity = '0';
+      });
+      document.querySelector('.sidebar-footer').style.display = 'block';
+      document.querySelector('.sidebar-footer').style.opacity = '0';
+      
+      // Change width with transition
+      leftSidebar.style.width = '240px';
+      
+      // After width starts changing, fade in elements
+      setTimeout(() => {
+        document.querySelectorAll('.menu-item span').forEach(span => {
+          span.style.opacity = '1';
+        });
+        document.querySelector('.sidebar-logo-text').style.opacity = '1';
+        document.querySelectorAll('.menu-section').forEach(section => {
+          section.style.opacity = '1';
+        });
+        document.querySelector('.sidebar-footer').style.opacity = '1';
+      }, 150);
+      
+      // Change icon to collapse/left arrow
+      toggleBtn.className = "fas fa-circle-chevron-left";
+    }
+  });
+  
+  // Initialize current year in footer
+  document.getElementById('year').textContent = new Date().getFullYear();
+  
+  // Dropdown toggle functionality (if leaderboard dropdown exists)
+  const leaderboardDropdown = document.getElementById('leaderboard-dropdown');
+  if (leaderboardDropdown) {
+    leaderboardDropdown.addEventListener('click', function() {
+      const dropdownMenu = document.getElementById('leaderboard-menu');
+      const dropdownTrigger = this.querySelector('.dropdown-trigger');
+      
+      dropdownMenu.classList.toggle('is-active');
+      dropdownTrigger.classList.toggle('is-active');
+    });
+  }
+</script>

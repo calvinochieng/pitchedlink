@@ -1,0 +1,319 @@
+<!-- templates/api_keys/list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Keys Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 30px; }
+        .create-form { background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .create-form input { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .api-key { background: #e9ecef; padding: 15px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .api-key-info { flex: 1; }
+        .api-key-name { font-weight: bold; color: #495057; }
+        .api-key-details { font-size: 0.9em; color: #6c757d; margin-top: 5px; }
+        .api-key-display { font-family: monospace; background: #f8f9fa; padding: 8px; border-radius: 3px; display: inline-block; margin-top: 5px; border: 1px solid #dee2e6; }
+        .api-key-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-small { padding: 5px 10px; font-size: 12px; }
+        .alert { padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px; }
+        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .key-display { background: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px; font-family: monospace; word-break: break-all; margin: 10px 0; position: relative; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: #218838; }
+        .copy-btn.copied { background: #6c757d; }
+        .key-container { position: relative; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Keys Management</h1>
+        
+        <div class="create-form">
+            <h3>Create New API Key</h3>
+            <form id="createForm">
+                {% csrf_token %}
+                <input type="text" id="keyName" placeholder="API Key Name" required style="width: 250px;">
+                <button type="submit" class="btn btn-primary">Create API Key</button>
+            </form>
+        </div>
+
+        <div id="alerts"></div>
+
+        <div id="apiKeysList">
+            <h3>Your API Keys</h3>
+            {% if api_keys %}
+                {% for key in api_keys %}
+                <div class="api-key">
+                    <div class="api-key-info">
+                        <div class="api-key-name">{{ key.name }}</div>
+                        <div class="api-key-display" id="displayKey{{ key.id }}">{{ key.display_key }}</div>
+                        <div class="api-key-details">
+                            Created: {{ key.created_at|date:"M d, Y H:i" }} | 
+                            {% if key.last_used %}
+                                Last used: {{ key.last_used|date:"M d, Y H:i" }}
+                            {% else %}
+                                Never used
+                            {% endif %}
+                            {% if not key.is_active %} | <strong>INACTIVE</strong>{% endif %}
+                        </div>
+                    </div>
+                    <div class="api-key-actions">
+                        {% if key.is_active %}
+                        <button class="btn btn-primary btn-small" onclick="copyDisplayKey('{{ key.display_key }}', this)">
+                            Copy Display
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteKey({{ key.id }}, '{{ key.name }}')">
+                            Delete
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No API keys created yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal for displaying new API key -->
+    <div id="keyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>API Key Created Successfully!</h3>
+            <p><strong>Important:</strong> Save this key now. You won't be able to see it again.</p>
+            <div class="key-container">
+                <div id="newKeyDisplay" class="key-display"></div>
+                <button class="copy-btn" onclick="copyToClipboard('newKeyDisplay')" id="copyKeyBtn">Copy</button>
+            </div>
+            <p><strong>Usage Examples:</strong></p>
+            <div class="key-container">
+                <div class="key-display" id="headerExample">
+                    # In your HTTP headers:<br>
+                    X-API-KEY: <span id="keyPlaceholder1">YOUR_API_KEY</span><br><br>
+                    # Or as Authorization header:<br>
+                    Authorization: Bearer <span id="keyPlaceholder2">YOUR_API_KEY</span>
+                </div>
+                <button class="copy-btn" onclick="copyHeaderExample()" id="copyHeaderBtn">Copy Header</button>
+            </div>
+            <div class="key-container">
+                <div class="key-display" id="curlExample">
+                    # cURL example:<br>
+                    curl -H "X-API-KEY: <span id="keyPlaceholder3">YOUR_API_KEY</span>" http://yoursite.com/api/hello/
+                </div>
+                <button class="copy-btn" onclick="copyCurlExample()" id="copyCurlBtn">Copy cURL</button>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal()">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        let currentApiKey = '';
+
+        function showAlert(message, type = 'success') {
+            const alerts = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alerts.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function closeModal() {
+            document.getElementById('keyModal').style.display = 'none';
+            currentApiKey = '';
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyKeyBtn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+                
+                showAlert('API key copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showAlert('API key copied to clipboard!');
+            });
+        }
+
+        function copyHeaderExample() {
+            const headerText = `X-API-KEY: ${currentApiKey}`;
+            
+            navigator.clipboard.writeText(headerText).then(() => {
+                const btn = document.getElementById('copyHeaderBtn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+                
+                showAlert('Header example copied to clipboard!');
+            }).catch(() => {
+                fallbackCopy(headerText);
+                showAlert('Header example copied to clipboard!');
+            });
+        }
+
+        function copyCurlExample() {
+            const curlText = `curl -H "X-API-KEY: ${currentApiKey}" http://yoursite.com/api/hello/`;
+            
+            navigator.clipboard.writeText(curlText).then(() => {
+                const btn = document.getElementById('copyCurlBtn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+                
+                showAlert('cURL example copied to clipboard!');
+            }).catch(() => {
+                fallbackCopy(curlText);
+                showAlert('cURL example copied to clipboard!');
+            });
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        function copyDisplayKey(displayKey, buttonElement) {
+            // Note: This copies the display version (with asterisks)
+            // The actual full key is only available when first created
+            navigator.clipboard.writeText(displayKey).then(() => {
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copied!';
+                buttonElement.classList.add('copied');
+                
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+                
+                showAlert('Display key copied! Note: This is a masked version for reference only.');
+            }).catch(() => {
+                fallbackCopy(displayKey);
+                showAlert('Display key copied! Note: This is a masked version for reference only.');
+            });
+        }
+
+        function showNewKey(keyData) {
+            currentApiKey = keyData.api_key;
+            document.getElementById('newKeyDisplay').textContent = keyData.api_key;
+            
+            // Update placeholders in examples
+            document.getElementById('keyPlaceholder1').textContent = keyData.api_key;
+            document.getElementById('keyPlaceholder2').textContent = keyData.api_key;
+            document.getElementById('keyPlaceholder3').textContent = keyData.api_key;
+            
+            document.getElementById('keyModal').style.display = 'block';
+        }
+
+        document.getElementById('createForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('keyName').value;
+            if (!name.trim()) {
+                showAlert('Please enter a name for the API key', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            try {
+                const response = await fetch('{% url "create_api_key" %}', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNewKey(data);
+                    document.getElementById('keyName').value = '';
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showAlert(data.error || 'Failed to create API key', 'error');
+                }
+            } catch (error) {
+                showAlert('Error creating API key', 'error');
+            }
+        });
+
+        async function deleteKey(keyId, keyName) {
+            if (!confirm(`Are you sure you want to delete the API key "${keyName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api-keys/${keyId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('API key deleted successfully');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Failed to delete API key', 'error');
+                }
+            } catch (error) {
+                showAlert('Error deleting API key', 'error');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('keyModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

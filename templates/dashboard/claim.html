@@ -1,0 +1,129 @@
+{% extends "./dashboard.html" %}
+{% load static %}
+{% block title %}Claim Your Pitch | PitchedLink{% endblock %}
+
+{% block content %}
+  <style>
+    body, .section, .box, .notification, .input {
+      background: #fff !important;
+      color: #222 !important;
+    }
+    .box, .notification {
+      border: 1px solid #eaeaea;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .button.is-black, .button.is-dark, .button.is-rounded {
+      background: #f5b700 !important;
+      color: #222 !important;
+      border: none;
+    }
+    .button.is-black:hover, .button.is-dark:hover {
+      background: #ffd700 !important;
+      color: #000 !important;
+    }
+    .label {
+      color: #222 !important;
+    }
+    .input {
+      background: #fff !important;
+      border: 1px solid #dbdbdb;
+      color: #222 !important;
+    }
+  </style>
+<section class="section" style="background: #fff; min-height: 100vh;">
+  <div class="container">
+    <div class="columns is-multiline">
+      <div class="column is-6">
+        <h1 class="title has-text-centered">🚀 Claim Your Pitch</h1>
+        <p class="subtitle has-text-centered">Get discovered by more users, investors, and indie founders.</p>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" class="box has-background-white">
+          {% csrf_token %}
+
+          <div class="field">
+            <label class="label">Product/Tool Name</label>
+            <div class="control">
+              <input class="input" type="text" name="name" placeholder="e.g. My Product" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">SaaS Product/ Startup/ Tool URL</label>
+            <div class="control">
+              <input class="input" type="url" name="product_url" placeholder="https://yourproduct.com" required>
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-centered mt-5">
+            <div class="control">
+              <button type="submit" class="button is-medium is-rounded">
+                Search and Claim
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <p class="has-text-centered is-size-7 has-text-grey">
+          We only use your X handle and SaaS Product/ Startup/ Tool URL to list your pitch, no spam, ever.
+        </p>
+      </div>
+      <div class="column is-6">
+        <h2 class="title has-text-centered">Claimable Pitches</h2>
+        
+        {% if claimable_pitches %}
+            {% for pitch in claimable_pitches %}
+              <div class="card pitch-card p-3">
+                <div class="card-content p-3">
+                    <div class="media">
+                        <div class="media-left">
+                            {% if pitch.icon_url %}
+                            <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
+                            {% else %}
+                            <div class="image is-48x48 has-background-light has-text-centered pt-2">
+                                <i class="fas fa-rocket has-text-primary"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-5 mb-1">{{ pitch.title }}</p>
+                            <p class="subtitle is-6 has-text-grey">
+                                {{ pitch.category.name|default:"Uncategorized" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="content mt-3">
+                        <div class="pitch-meta">
+                            <span><i class="fas fa-bullhorn"></i> {{ pitch.mention_count }} mentions</span>
+                            <span><i class="fas fa-gem has-text-danger"></i> Rank {{ pitch.rank }}</span>
+                            <span><i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.clap }} claps</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="button is-link">
+                  Claim <span class="ml-1 icon"><i class="fas fa-hand-holding-hand"></i></span>
+                </button>
+              </div>
+            {% endfor %}
+        {% else %}
+        <div class="card">
+          <div class="card-content has-text-centered">
+            <p>No claimable pitches found.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "./base.html" %}
+
+
+{% block title %}Leaderboard | PitchedLink{% endblock %}
+{% load static %}
+{% block custom_styles %}
+ <style>
+   .right-sidebar{
+    width: 100% !important;
+   }
+   .navbar {
+    transition: transform 0.3s ease-in-out;
+    }
+
+ </style>
+{% endblock custom_styles %}
+
+{% block content %}
+<div class="app-container">  
+
+  {% include 'pitches/right-sidebar.html' %}
+    
+
+</div>
+
+<style>
+    /* Pagination Styles */
+    .pagination {
+        margin: 2rem 0;
+        padding: 0 1.5rem;
+    }
+
+    .pagination-previous,
+    .pagination-next,
+    .pagination-link {
+        border: 1px solid #333;
+        transition: all 0.2s ease;
+    }
+
+    .pagination-previous:hover,
+    .pagination-next:hover,
+    .pagination-link:hover {
+        background-color: #333 !important;
+        border-color: #F5B30C;
+        color: #F5B30C !important;
+    }
+
+    .pagination-link.is-current {
+        background-color: #F5B30C !important;
+        border-color: #F5B30C;
+        color: #000 !important;
+        font-weight: bold;
+    }
+
+    .pagination-ellipsis {
+        color: #888;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+        .pagination {
+            padding: 0 1rem;
+        }
+        
+        .pagination-list {
+            margin: 0.5rem 0;
+        }
+        
+        .pagination-link {
+            min-width: 2.25em;
+        }
+    }
+</style>
+
+{% endblock %}

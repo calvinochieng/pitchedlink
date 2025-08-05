@@ -1,0 +1,833 @@
+{% load static %}
+<style>
+  /* Color Variables */
+  :root {
+    --bg-color: #ffffff;
+    --card-bg: #f8f9fa;
+    --card-hover: #e9ecef;
+    --text-primary: #2d3436;
+    --text-secondary: #6c757d;
+    --border-color: #e6a50d1a;
+    --heart-color: #e63946;
+    --rank-1: #ffd700;
+    --rank-2: #c0c0c0;
+    --rank-3: #cd7f32;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Right sidebar - Leaderboard */
+  .right-sidebar {
+    background-color: var(--bg-color);
+    width: 450px;
+    flex: 1;
+    overflow-y: auto;
+    height: 100vh;
+    scroll-snap-type: y mandatory;
+    flex-shrink: 0;
+    border-left: 1px solid var(--card-hover);
+    position: relative;
+    padding: 0;
+    box-shadow: var(--shadow);
+    scroll-behavior: smooth;
+  }
+  
+  /* Floating Scroll Buttons */
+  .scroll-buttons {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 100;
+    transition: all 0.3s ease;
+  }
+
+  .scroll-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #000000;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    opacity: 0.9;
+  }
+
+  .scroll-btn:hover {
+    background-color: #ffc107;
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  .scroll-btn:active {
+    transform: scale(0.95);
+  }
+
+  .scroll-btn:disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+  }
+
+  .scroll-btn i {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 1024px) {
+    .scroll-buttons {
+      right: 10px;
+    }
+    
+    .scroll-btn {
+      width: 36px;
+      height: 36px;
+      font-size: 14px;
+    }
+  }
+
+  /* Header styling */
+  .leaderboard-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-color);
+    padding: 20px 25px 15px;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--card-hover);
+    backdrop-filter: blur(10px);
+  }
+  
+  .leaderboard-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    margin: 0;
+    gap: 8px;
+  }
+  
+  .leaderboard-title i {
+    color: var(--rank-1);
+    margin-right: 10px;
+    font-size: 1.5rem;
+  }
+  
+  .leaderboard-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .filter-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    color: #555;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .filter-btn:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-1px);
+  }
+  
+  .filter-btn.active {
+    background-color: #FFD700;
+    border-color: #FFD700;
+    color: #000;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(255, 200, 0, 0.2);
+  }
+  
+  /* Content container */
+  .leaderboard-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  /* Standardized section styling - ALL ITEMS SAME SIZE */
+  .right-sidebar-section {
+    {% comment %} height: 100vh; {% endcomment %}
+    scroll-snap-align: center ;
+    display: flex;
+    flex-direction: column;
+    padding: 54px 1rem 25px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .right-sidebar-section > div {
+    {% comment %} aspect-ratio: 9 / 16; {% endcomment %}
+    {% comment %} width: 100%; {% endcomment %}
+    max-width: 600px;
+    {% comment %} height: auto; {% endcomment %}
+  }
+  
+  /* Unified card styling - ALL CARDS SAME DIMENSIONS */
+  .leaderboard-card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    {% comment %} aspect-ratio: 9 / 16; {% endcomment %}
+  }
+  
+  .leaderboard-card:hover {
+    transform: translateY(-5px);
+    border-color: #e0e0e0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Trophy styling for top 3 */
+  .leaderboard-card.rank-1 {
+    background: var(--rank-1);
+    border: 2px solid #FFD700;
+    box-shadow: 0 8px 25px rgba(255, 200, 0, 0.15);
+  }
+  
+  .leaderboard-card.rank-2 {
+    background: var(--rank-2);
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  }
+  
+  .leaderboard-card.rank-3 {
+    background: var(--rank-3);
+    border: 2px solid #d4a76a;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Rank number styling */
+  .rank-number {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+  
+  .rank-1 .rank-number {
+    background-color: #FFD700;
+    color: #000;
+  }
+  
+  .rank-2 .rank-number {
+    background-color: #C0C0C0;
+    color: #000;
+  }
+  
+  .rank-3 .rank-number {
+    background-color: #CD7F32;
+    color: #000;
+  }
+  
+  .leaderboard-card:not(.rank-1):not(.rank-2):not(.rank-3) .rank-number {
+    background-color: #f0f0f0;
+    color: #555;
+    font-weight: 600;
+  }
+  
+  /* Trophy icon for top 3 */
+  .trophy-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    z-index: 2;
+  }
+  
+  .rank-1 .trophy-icon {
+    color: #FFD700;
+  }
+  
+  .rank-2 .trophy-icon {
+    color: #C0C0C0;
+  }
+  
+  .rank-3 .trophy-icon {
+    color: #CD7F32;
+  }
+  
+  /* Image section - standardized for all cards */
+  .card-image {
+    flex: 0 0 auto;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    opacity: 0.8;
+  }
+  
+  .leaderboard-card:hover .card-image img {
+    transform: scale(1.05);
+  }
+  
+  .time-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #555;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: pointer;
+  }
+  
+  /* Card content - standardized */
+  .card-content {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  
+  .card-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .card-title-container {
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .card-category {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  
+  .card-description-right {
+    font-size: 0.9rem;
+    color: #282828;
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+  
+  /* Badges section - moved after description */
+  .card-badges {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .card-badge {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .card-badge i {
+    margin-right: 3px;
+  }
+  
+  .card-badge.featured {
+    background-color: #FFD700;
+    color: #000;
+  }
+  
+  .card-badge.launched {
+    background-color: #e0e0e0;
+    color: #555;
+  }
+  
+  .card-badge.claimed {
+    background-color: #FFA500;
+    color: #000;
+  }
+  
+  .card-badge.verified {
+    background-color: #1DA1F2;
+    color: #fff;
+  }
+  
+  /* Engagement metrics from pitch_data */
+  .engagement-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+  }
+  
+  .engagement-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+  }
+  
+  .engagement-label {
+    display: flex;
+    align-items: center;
+    color: #666;
+  }
+  
+  .engagement-label i {
+    margin-right: 6px;
+    width: 14px;
+    color: #888;
+  }
+  
+  .engagement-value {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  /* Source user info styling - now using inline styles */
+  
+  .verified-badge {
+    margin-left: 5px;
+    color: #1DA1F2;
+  }
+  
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: auto;
+  }
+  
+  .card-stats {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .card-stat {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .rank-1 .card-stat i {
+    color: #FFD700;
+    margin-right: 5px;
+  }
+  
+  .rank-2 .card-stat i {
+    color: #C0C0C0;
+    margin-right: 5px;
+  }
+  
+  .rank-3 .card-stat i {
+    color: #CD7F32;
+    margin-right: 5px;
+  }
+  
+  .leaderboard-card:not(.rank-1):not(.rank-2):not(.rank-3) .card-stat i {
+    color: #FFA500;
+    margin-right: 5px;
+  }
+  
+  .card-cta-container {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .card-cta {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .rank-1 .card-cta.primary {
+    background-color: #FFD700;
+    color: #000;
+    border: 1px solid #e6c200;
+  }
+  
+  .rank-1 .card-cta.primary:hover {
+    background-color: #ffd700;
+  }
+  
+  .rank-2 .card-cta.primary {
+    background-color: #e0e0e0;
+    color: #555;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .rank-2 .card-cta.primary:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .rank-3 .card-cta.primary {
+    background-color: #d4a76a;
+    color: #000;
+    border: 1px solid #d4a76a;
+  }
+  
+  .rank-3 .card-cta.primary:hover {
+    background-color: #d4a76a;
+  }
+  
+  .leaderboard-card:not(.rank-1):not(.rank-2):not(.rank-3) .card-cta.primary {
+    background-color: #FFA500;
+    color: #000;
+    border: 1px solid #FFA500;
+  }
+  
+  .leaderboard-card:not(.rank-1):not(.rank-2):not(.rank-3) .card-cta.primary:hover {
+    background-color: #FFA500;
+  }
+  
+  .card-cta.secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #333;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .card-cta.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Scrollbar styling */
+  .right-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #f0f0f0;
+  }
+  
+  .right-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .right-sidebar::-webkit-scrollbar-track {
+    background: #222;
+  }
+  
+  .right-sidebar::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 3px;
+  }
+
+  /* Tooltip styles */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+  }
+  
+  .tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+</style>
+
+<div class="right-sidebar" id="leaderboardContainer">
+  <!-- Floating Scroll Buttons -->
+  <div class="scroll-buttons">
+    <button class="scroll-btn" id="scrollUp" aria-label="Scroll up">
+      <i class="fas fa-chevron-up"></i>
+    </button>
+    <button class="scroll-btn" id="scrollDown" aria-label="Scroll down">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+  </div>
+  {%if not is_mobile %}
+    <div class="leaderboard-header">
+      <h2 class="leaderboard-title">
+        <i class="fa-solid fa-trophy"></i>
+        Leaderboard
+      </h2>
+    </div>
+  {% endif %}  
+  <!-- All Pitches with Standardized Cards -->
+  {% for pitch in top_pitches %}
+  <div class="right-sidebar-section">
+    <div class="leaderboard-card rank-{{ forloop.counter }}">
+      <div class="rank-number">{{ forloop.counter }}</div>
+      
+      <!-- Trophy icon for top 3 only -->
+      {% if forloop.counter <= 3 %}
+      <div class="trophy-icon">
+        {% if forloop.counter == 1 %}
+        <i class="fa-solid fa-trophy fa-2x"></i>
+        {% elif forloop.counter == 2 %}
+        <i class="fa-solid fa-medal fa-2x"></i>
+        {% elif forloop.counter == 3 %}
+        <i class="fa-solid fa-award fa-2x"></i>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      <div class="card-image">
+        <a href="{% url 'detail' slug=pitch.slug %}">
+          <img src="{{ pitch.banner_url }}" alt="{{ pitch.name }}" 
+               onerror="this.onerror=null; this.src='{% static 'preview.jpg' %}';">
+        </a>
+      </div>
+      
+      <div class="card-content">
+        <div class="card-header">
+          <div class="card-icon">
+            <a href="{% url 'detail' slug=pitch.slug %}" style="display: block; height: 100%;">
+              <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }} icon" 
+                   onerror="this.onerror=null; this.src='{% static 'icon.png' %}';">
+            </a>
+          </div>
+          <div class="card-title-container">
+            <h3 class="card-title"><a href="{% url 'detail' slug=pitch.slug %}" style="color: inherit; text-decoration: none;">{{ pitch.name|truncatechars:25 }}</a></h3>
+            <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 2px;">
+              <span class="card-category" style="color: #666; font-weight: 500; font-size: 0.8rem; line-height: 4px;">
+                {% if pitch.category %}{{ pitch.category }}{% else %}Software{% endif %}
+              </span>
+              {% if pitch.pitch_data and pitch.pitch_data.0.user %}
+              <div style="font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 4px;">
+                <span>by</span>
+                <a href="https://x.com/{{ pitch.pitch_data.0.user.handle }}" 
+                   style="color: #2c3e50; font-weight: 500; text-decoration: none;" 
+                   target="_blank">
+                  {{ pitch.pitch_data.0.user.name }}
+                  {% if pitch.pitch_data.0.user.verified %}
+                  <i class="fa-solid fa-circle-check verified-badge" style="color: #1DA1F2; font-size: 0.7em; margin-left: 2px;"></i>
+                  {% endif %}
+                  <span style="color: #888; margin-left: 2px;">@{{ pitch.pitch_data.0.user.handle }}</span>
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- Description -->
+        <p class="card-description-right">
+          {% if pitch.description %}
+           {{ pitch.description|truncatechars:280 }}
+           <a href="{% url 'detail' slug=pitch.slug %}" style="color: inherit; text-decoration: none;">Read more</a>
+          {% else %}
+            {{ pitch.title|truncatechars:280 }}
+          {% endif %}
+        </p>
+        
+        <!-- Badges moved after description -->
+        <div class="card-badges">
+          {% if pitch.is_featured %}
+          <div class="card-badge featured">
+            <i class="fa-solid fa-star"></i> Featured
+          </div>
+          {% endif %}
+          
+          {% if pitch.is_launched %}
+          <div class="card-badge launched">
+            <i class="fa-solid fa-rocket"></i> Launched
+          </div>
+          {% endif %}
+          
+          {% if pitch.claimed %}
+          <div class="card-badge claimed">
+            <i class="fa-solid fa-check"></i> Claimed
+          </div>
+          {% endif %}
+          
+          {% if pitch.pitch_data and pitch.pitch_data.0.user.verified %}
+          <div class="card-badge verified">
+            <i class="fa-solid fa-badge-check"></i> Verified Source
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="card-footer">
+          <div class="card-stats">
+            <div class="card-stat">
+              <i class="fa-solid fa-fire has-text-danger"></i>
+              <span>{{ pitch.rank }}</span>
+            </div>
+            <div class="card-stat">
+              <i class="fa-solid fa-hands-clapping has-text-success"></i>
+              <span>{{ pitch.clap }}</span>
+            </div>
+          </div>
+          
+          <div class="card-cta-container">
+            {% if pitch.url %}
+            <a href="{{ pitch.url }}" class="card-cta primary" target="_blank">
+              <i class="fas fa-external-link-alt"></i>
+              Visit Site
+            </a>
+            {% endif %}
+            {% if pitch.slug %}
+            <a href="{% url 'detail' slug=pitch.slug %}" class="card-cta secondary">
+              <i class="fas fa-info-circle"></i>
+              Details
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('leaderboardContainer');
+  const scrollUpBtn = document.getElementById('scrollUp');
+  const scrollDownBtn = document.getElementById('scrollDown');
+  const scrollAmount = 300; // pixels to scroll
+
+  // Simple smooth scroll function
+  function smoothScroll(element, direction) {
+    const start = element.scrollTop;
+    const maxScroll = element.scrollHeight - element.clientHeight;
+    let target;
+    
+    if (direction === 'up') {
+      target = Math.max(0, start - scrollAmount);
+    } else {
+      target = Math.min(maxScroll, start + scrollAmount);
+    }
+    
+    element.scrollTo({
+      top: target,
+      behavior: 'smooth'
+    });
+  }
+
+  // Event listeners for buttons
+  scrollUpBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    smoothScroll(container, 'up');
+  });
+  
+  scrollDownBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    smoothScroll(container, 'down');
+  });
+
+  // Function to update button states based on scroll position
+  function updateButtonStates() {
+    // Disable/enable up button
+    const atTop = container.scrollTop <= 10;
+    scrollUpBtn.disabled = atTop;
+    scrollUpBtn.setAttribute('aria-hidden', atTop.toString());
+    
+    // Disable/enable down button
+    const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 10;
+    scrollDownBtn.disabled = isAtBottom;
+    scrollDownBtn.setAttribute('aria-hidden', isAtBottom.toString());
+  }
+
+  // Update button states on scroll
+  container.addEventListener('scroll', updateButtonStates);
+  
+  // Set initial button states
+  updateButtonStates();
+});
+</script>

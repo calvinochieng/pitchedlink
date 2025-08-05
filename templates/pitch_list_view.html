@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pitch List Metadata Extractor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Pitch List Metadata Extractor</h1>
+      
+      {% if error %}
+        <div class="notification is-danger">
+          {{ error }}
+        </div>
+      {% endif %}
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="field">
+          <label class="label">Pitch JSON (List)</label>
+          <div class="control">
+            <textarea class="textarea" name="pitch_json" placeholder='Paste your pitch list JSON here...'>{{ pitch_json }}</textarea>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button type="submit" class="button is-primary">Extract Metadata</button>
+          </div>
+        </div>
+      </form>
+      
+      {% if metadata_list %}
+        <h2 class="title is-4" style="margin-top: 2rem;">Extracted Pitches</h2>
+        <div class="columns is-multiline">
+          {% for metadata in metadata_list %}
+          <div class="column is-one-third">
+            <div class="card">
+              <!-- Card Image: Main Preview Image -->
+              <div class="card-image">
+                <figure class="image is-4by3">
+                  <img src="{{ metadata.image }}" alt="Site Preview Image">
+                </figure>
+              </div>
+              <!-- Card Content -->
+              <div class="card-content">
+                <div class="media">
+                  <!-- Site Icon -->
+                  <div class="media-left">
+                    <figure class="image is-48x48">
+                      <img src="{{ metadata.icon }}" alt="Site Icon">
+                    </figure>
+                  </div>
+                  <!-- Site Title & URL -->
+                  <div class="media-content">
+                    <p class="title is-5">{{ metadata.title }}</p>
+                    <p class="subtitle is-6">
+                      <a href="{{ metadata.url }}" target="_blank">{{ metadata.url }}</a>
+                    </p>
+                  </div>
+                </div>
+                <!-- Site Description -->
+                <div class="content">
+                  {{ metadata.description }}
+                  <br>
+                  <a href="{{ metadata.url }}" target="_blank" class="button is-link is-small">Visit Site</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+    </div>
+  </section>
+</body>
+</html>

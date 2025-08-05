@@ -1,0 +1,32 @@
+/* Custom Dashboard Styles */
+.dashboard-container {
+/*    display: flex;*/
+    min-height: 100vh;
+}
+
+.dashboard-main {
+    flex-grow: 1;
+    padding: 2rem;
+}
+
+.analysis-item {
+    transition: transform 0.2s ease-in-out;
+}
+
+.analysis-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.analysis-preview {
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+#loading-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+}

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Information -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} Microsaaslink</title>
+    {% load static %}
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" href="{% static 'icon.ico' %}" type="image/x-icon">
+
+    <meta name="description" content="{% block description %}{% endblock description %}">
+    <meta name="keywords" content="">
+    <meta name="author" content="Calvin Ochieng">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@calvinochieng_">
+    <meta name="twitter:image:alt" content="Microsaaslink">
+
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://microsaasl.ink">
+    <meta property="og:image:alt" content="Microsaaslink">
+    <meta property="og:site_name" content="Microsaaslink">
+    <meta property="og:locale" content="en_US">
+
+    
+    {% block meta %} {% endblock meta %}
+
+    <!-- Schema.org (JSON-LD for Rich Results) -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "website",
+          "name": "Microsaaslink",
+          "author": {
+            "@type": "Person",
+            "name": "Calvin Ochieng"
+          },
+          "description": "",
+          "image": "{% static 'app/images/microsaaslink.png' %}",
+          "url": "https://microsaasl.ink",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Microsaas Link"
+          },
+          "inLanguage": "en",
+          "datePublished": "2025-2-10"
+        }
+    </script>
+        
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">    
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    {% block custom_styles %}{% endblock custom_styles %}
+    <style>        
+        .section { padding: 3rem 1.5rem; }
+        .content { max-width: 800px; margin: 0 auto; }
+        .section section{ margin-top: 2rem; }
+        .toc-list { list-style-type: none; padding: 0; }
+    </style>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="83fb281a-fd05-4d48-8543-7ad5161ce835"></script>
+</head>
+<body>
+     <!-- Navigation Bar -->
+  <nav class="navbar is-primary" style="overflow: hidden;">
+   <div class="container">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="{% url 'terms_of_service' %}" class="has-text-light">Terms of Service</a>
+          <a class="navbar-item" href="{% url 'privacy_policy' %}" class="has-text-light">Privacy Policy</a>
+          <a class="navbar-item" href="{% url 'refund_policy' %}" class="has-text-light">Refund Policy</a>
+          <a class="navbar-item" href="{% url 'contact' %}" class="has-text-light">Contact Support</a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-link is-rounded is-outlined" href="{% url 'account_login' %}">
+                <strong>Login</strong>
+              </a>
+              <a class="button is-link is-rounded" href="{% url 'account_signup' %}">
+                <strong>Signup</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+  </nav>
+
+    <!-- Content Section -->
+ 
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+                {{ message }}
+                <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                    <i class="fa fa-times"></i> <!-- Close icon -->
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock content %}
+        
+    <!-- Footer -->
+<footer class="footer has-background-dark pt-6 pb-4">
+    <div class="container">
+        <div class="columns is-multiline">
+            <!-- Logo and Mission -->
+            <div class="column is-4">
+                <div class="footer-brand mb-4">
+                    <img src=" {% static "app/images/icon.png" %}" alt="Microsaaslink" class="footer-logo mb-3" width="150">
+                    <p class="has-text-grey-light mb-4">Discover untapped market opportunities by analyzing user feedback from existing SaaS products.</p>
+                </div>
+                <div class="newsletter-signup">
+                    <p class="has-text-turquoise mb-2"><strong>Get micro-SaaS opportunities in your inbox</strong></p>
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input class="input" type="email" placeholder="Your email">
+                        </div>
+                        <div class="control">
+                            <button class="button is-turquoise">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="/" class="has-text-light">Home</a></li>
+                    <li><a href="/#features" class="has-text-light">Features</a></li>
+                    <li><a href="/#how-it-works" class="has-text-light">How It Works</a></li>
+                    <li><a href="{% url 'pricing' %}" class="has-text-light">Pricing</a></li>
+                    <li><a href="/about" class="has-text-light">About Us</a></li>
+                    <li><a href="/blog" class="has-text-light">Blog</a></li>
+                </ul>
+            </div>
+            
+            <!-- Partner Websites -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Partners</h4>
+                <ul class="footer-links">
+                    <li><a href="https://5munlocked.ink/" target="_blank" rel="noopener" class="has-text-light">5MUnlocked</a></li>
+                    <li><a href="https://microsaasl.ink/" target="_blank" rel="noopener" class="has-text-light">MicrosaasLink</a></li>
+                    <li><a href="https://xtuls.com/" target="_blank" rel="noopener" class="has-text-light">Xtuls</a></li>
+                </ul>
+            </div>
+            
+            <!-- Support & Legal -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'terms_of_service' %}" class="has-text-light">Terms of Service</a></li>
+                    <li><a href="{% url 'privacy_policy' %}" class="has-text-light">Privacy Policy</a></li>
+                    <li><a href="{% url 'refund_policy' %}" class="has-text-light">Refund Policy</a></li>
+                    <li><a href="{% url 'contact' %}" class="has-text-light">Contact Support</a></li>
+                    {% comment %} <li><a href="{% url 'faq' %}" class="has-text-light">FAQ</a></li> {% endcomment %}
+                </ul>
+            </div>
+            
+            <!-- Social Links -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Connect</h4>
+                <div class="social-icons mb-4">
+                    <a href="https://x.com/calvinochieng_" target="_blank" rel="noopener" class="icon is-medium mr-2 has-text-light">
+                        <i class="fab fa-x-twitter fa-lg"></i>
+                    </a>
+                    <a href="https://www.producthunt.com/posts/microsaaslink" class="icon is-medium has-text-light">
+                        <i class="fab fa-product-hunt fa-lg"></i>
+                    </a>
+                </div>
+                <p class="has-text-grey-light">
+                    <span class="icon is-small mr-1">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <a href="mailto:hello@microsaaslink.com" class="has-text-light">info@microsaasl.ink</a>
+                </p>
+            </div>
+        </div>
+        
+        <hr class="footer-divider">
+        
+        <!-- Bottom Footer -->
+        <div class="columns is-vcentered mt-5">
+            <div class="column">
+                <p class="has-text-grey-light">&copy; <span id="year">2025</span> Microsaaslink. All rights reserved.</p>
+            </div>
+            <div class="column has-text-right">
+                <p class="has-text-grey-light is-size-7">
+                    <span class="payment-icons mr-2">
+                        <i class="fab fa-cc-visa fa-lg mr-1"></i>
+                        <i class="fab fa-cc-mastercard fa-lg mr-1"></i>
+                        <i class="fab fa-cc-paypal fa-lg"></i>
+                    </span>
+                    Secure payments by Paddle
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</footer>
+
+<style>
+    .has-text-turquoise {
+        color: #00d1b2 !important;
+    }
+    .is-turquoise {
+        background-color: #00d1b2;
+        border-color: transparent;
+        color: #fff;
+    }
+    .footer {
+        background-color: #191919;
+    }
+    .footer-heading {
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: block !important;
+    }
+    .footer-links li {
+        margin-bottom: 0.75rem;
+    }
+    .footer-links a {
+        transition: color 0.2s ease;
+    }
+    .footer-links a:hover {
+        color: #00d1b2 !important;
+    }
+    .social-icons a {
+        transition: all 0.3s ease;
+    }
+    .social-icons a:hover {
+        color: #00d1b2 !important;
+        transform: translateY(-3px);
+    }
+    .footer-divider {
+        background-color: rgba(255, 255, 255, 0.1);
+        height: 1px;
+        margin: 2rem 0;
+    }
+    .footer-logo {
+        max-height: 40px;
+    }
+    .newsletter-signup .input {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    .newsletter-signup .input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+</style>
+    
+
+    <!-- JavaScript -->
+    <script>
+        // Smooth scroll implementation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Highlight current section in TOC
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc-list a');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if(window.scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('has-text-weight-bold');
+                if(link.getAttribute('href').includes(current)) {
+                    link.classList.add('has-text-weight-bold');
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script>
+        document.querySelector('.navbar-burger').addEventListener('click', function () {
+            const target = document.getElementById(this.dataset.target);
+            target.classList.toggle('is-active');
+        });
+    </script>   
+    {% block scripts %}{% endblock scripts %}
+        
+</body>
+</html>
