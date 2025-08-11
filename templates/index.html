@@ -7,11 +7,11 @@
     <!-- meta seo -->
     <meta property="og:title" content="Discover the Hottest SaaS Pitches">
     <meta property="og:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
-    <meta property="og:image" content="{% static 'preview.jpg' %}">
+    <meta property="og:image" content="{% static 'pitchedlink-og.png' %}">
     
     <meta name="twitter:title" content="Discover the Hottest SaaS Pitches">
     <meta name="twitter:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
-    <meta name="twitter:image" content="{% static 'preview.jpg' %}">
+    <meta name="twitter:image" content="{% static 'pitchedlink-og.png' %}"> 
 {% endblock meta %}
 
 {% block custom_styles %}
@@ -430,7 +430,7 @@
                                     <span class="icon">
                                         <i class="fas fa-hands-clapping has-text-success"></i>
                                     </span>
-                                    <span>{{ pitch.clap }} Claps</span>
+                                    <span>{{ pitch.get_clap_count }} Claps</span>
                                     </span>
                                 </div>
                                 </div>

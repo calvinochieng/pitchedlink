@@ -1,7 +1,7 @@
 # urls.py for the saas_analyzer app
 from django.urls import path, include
 from .views import *
-from .dashboard_view import dashboard, onboard_user, claim_pitch,add_claim
+from .dashboard_view import dashboard, onboard_user, claim_pitch,verify_claim,quick_claim
 from django.contrib.sitemaps.views import sitemap
 from app.sitemaps import PitchSitemap, CategorySitemap, StaticViewSitemap
 
@@ -18,12 +18,13 @@ urlpatterns = [
     path('home/', home, name='home'),
     path("leaderboard/", leaderboard, name="leaderboard"),
     path('categories/', categories, name='categories'),
+    path('claim/', claim_pitch, name='claim_pitch'),
 
     # Dashboard
     path('dashboard/', dashboard, name="dashboard"),
     path('dashboard/onboard/', onboard_user, name='onboard_user'),
-    path('dashboard/claim_pitch/', claim_pitch, name='claim_pitch'),
-    path('dashboard/add-claim/', add_claim, name='add_claim'),
+    path('dashboard/quick_claim/', quick_claim, name='quick_claim'),
+    path('dashboard/verify-claim/', verify_claim, name='verify_claim'),
     #Include genapp urls
     path('', include('app.genapp.gen_urls')),
 

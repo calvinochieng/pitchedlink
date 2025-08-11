@@ -291,6 +291,20 @@
             .card.stats-card > .subtitle{
                 font-size: 12px !important;
             }
+            
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #363636;
+            color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -311,7 +325,6 @@
         <div id="navbarMenu" class="navbar-menu">
             <div class="navbar-start">
                 <a href="{% url 'dashboard' %}" class="navbar-item is-active">Dashboard</a>
-                <a href="#my-pitches" class="navbar-item">My Pitches</a>
                 <a href="{% url 'index' %}#new-pitches" class="navbar-item">New Pitches</a>
                 <a href="{% url 'leaderboard' %}" class="navbar-item">Leaderboard</a>
             </div>
@@ -322,7 +335,7 @@
                     </a>
                     <div class="navbar-dropdown is-right">
                         <a href="{% url 'dashboard' %}" class="navbar-item">Dashboard</a>
-                        <a href="#" class="navbar-item">Settings</a>
+                        {% comment %} <a href="#" class="navbar-item">Settings</a> {% endcomment %}
                         <hr class="navbar-divider">
                         <form method="post" action="{% url 'account_logout' %}">
                             {% csrf_token %}
@@ -488,6 +501,29 @@
                             </div>
                         </a>
                     </div>
+                    
+                    <div class="column is-4">
+                        <a href="{% url 'tweet_hook' %}">
+                            <div class="card tool-card">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon has-text-primary">
+                                            <i class="fas fa-bullhorn fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h3 class="title is-5 mb-2">Tweet Hook</h3>
+                                        <p class="subtitle is-6">Generates tweet hooks for your startup</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button class="button is-light is-small">
+                                        Write <i class="fas fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -507,15 +543,15 @@
                 
                 {% if claimed_pitches %}
                 <div class="columns is-multiline">
-                    {% for pitch in claimed_pitches|slice:":3" %}
+                    {% for claim in claimed_pitches|slice:":3" %}
                     <div class="column is-4">
-                        <a href="{% url 'detail' slug=pitch.slug %}">
-                            <div class="card pitch-card">
-                                <div class="card-content">
+                        <div class="card pitch-card">
+                            <div class="card-content">
+                                <a href="{% url 'detail' slug=claim.pitch.slug %}">
                                     <div class="media">
                                         <div class="media-left">
-                                            {% if pitch.icon_url %}
-                                            <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
+                                            {% if claim.pitch.icon_url %}
+                                            <img src="{{ claim.pitch.icon_url }}" alt="{{ claim.pitch.name }}" class="image is-48x48">
                                             {% else %}
                                             <div class="image is-48x48 has-background-light has-text-centered pt-2">
                                                 <i class="fas fa-rocket has-text-primary"></i>
@@ -523,23 +559,44 @@
                                             {% endif %}
                                         </div>
                                         <div class="media-content">
-                                            <p class="title is-5 mb-1">{{ pitch.name }}</p>
+                                            <p class="title is-5 mb-1">{{ claim.pitch.name }}</p>
                                             <p class="subtitle is-6 has-text-grey">
-                                                {{ pitch.category.name|default:"Uncategorized" }}
+                                                {{ claim.pitch.category.name|default:"Uncategorized" }}
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="content mt-3">
-                                        <div class="pitch-meta">
-                                            <span><i class="fas fa-bullhorn"></i> {{ pitch.mention_count }} mentions</span>
-                                            <span><i class="fas fa-gem has-text-danger"></i> Rank {{ pitch.rank }}</span>
-                                            <span><i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.clap }} claps</span>
-                                        </div>
+                                </a>
+                                <div class="content mt-3">
+                                    <div class="pitch-meta">
+                                        <span><i class="fas fa-bullhorn"></i> {{ claim.pitch.mention_count }} mentions</span>
+                                        <span><i class="fas fa-gem has-text-danger"></i> Rank {{ claim.pitch.rank }}</span>
+                                        <span><i class="fas fa-hands-clapping has-text-success"></i> {{ claim.pitch.get_clap_count }} claps</span>
                                     </div>
                                 </div>
-                                <span class="tag is-success is-light">Verified</span>
+                                {% if claim.status == 'verified' %}
+                                    <a href="{% url 'detail' claim.pitch.slug %}" class="button is-link">
+                                        View <i class="fas fa-external-link-alt ml-2"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'detail' claim.pitch.slug %}" class="button is-link">
+                                        View <i class="fas fa-external-link-alt ml-2"></i>
+                                    </a>
+                                    <button class="button is-warning" onclick="openVerifyModal({{ claim.pitch.id }})">Verify Claim</button>
+                                {% endif %}
                             </div>
-                        </a>
+                            <span class="tag
+                                {% if claim.status == 'verified' %} is-success is-light
+                                {% elif claim.status == 'pending' %} is-warning is-light
+                                {% elif claim.status == 'rejected' %} is-danger is-light
+                                {% else %} is-light
+                                {% endif %}">
+                            {% if claim.status == 'verified' %}Verified
+                            {% elif claim.status == 'pending' %}Pending verification
+                            {% elif claim.status == 'rejected' %}Rejected
+                            {% else %}Not claimed
+                            {% endif %}
+                            </span>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -575,46 +632,46 @@
                 <div class="columns is-multiline">
                     {% for pitch in suggested_pitches|slice:":3" %}
                     <div class="column is-4">
-                        <div class="card pitch-card">
-                            <div class="card-content">
-                                <div class="media">
-                                    <div class="media-left">
-                                        {% if pitch.icon_url %}
-                                        <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
-                                        {% else %}
-                                        <div class="image is-48x48 has-background-light has-text-centered pt-2">
-                                            <i class="fas fa-cube has-text-info"></i>
+                        <a href="{% url 'detail' pitch.slug %}">
+                            <div class="card pitch-card">
+                                <div class="card-content">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            {% if pitch.icon_url %}
+                                            <img src="{{ pitch.icon_url|default:'/static/icon.png' }}" 
+                                                alt="{{ pitch.name }}" 
+                                                class="image is-48x48"
+                                                onerror="this.src='{% static 'icon.png' %}'">
+                                            {% else %}
+                                            <div class="image is-48x48 has-background-light has-text-centered pt-2">
+                                                <i class="fas fa-cube has-text-info"></i>
+                                            </div>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
+                                        <div class="media-content">
+                                            <p class="title is-5 mb-1">{{ pitch.name }}</p>
+                                            <p class="subtitle is-6 has-text-grey">
+                                                {{ pitch.category.name|default:"Uncategorized" }}
+                                            </p>
+                                        </div>
+                                        <div class="media-right">
+                                            <button class="button is-link" onclick="window.open('{% url 'detail' pitch.slug %}', '_blank')">
+                                               <i class="fas fa-external-link-alt ml-1"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="media-content">
-                                        <p class="title is-5 mb-1">{{ pitch.name }}</p>
-                                        <p class="subtitle is-6 has-text-grey">
-                                            {{ pitch.category.name|default:"Uncategorized" }}
-                                        </p>
-                                    </div>
-                                    <div class="media-right">
-                                        <span class="tag is-info is-light">
-                                            {{ pitch.get_engagement_score }} <i class="fas fa-fire ml-1"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="content mt-3">
-                                    <p>{{ pitch.description|truncatewords:20 }}</p>
-                                </div>
-                                <div class="level is-mobile mt-4">
-                                    <div class="level-left">
-                                        <span class="icon-text mr-3"><i class="far fa-comment-alt"></i>&nbsp;{{ pitch.total_engagement.replies }}</span>
-                                        <span class="icon-text"><i class="fas fa-heart has-text-danger"></i>&nbsp;{{ pitch.total_engagement.likes }}</span>
-                                    </div>
-                                    <div class="level-right">
-                                        <button onclick="openClaimModal({{ pitch.id }}, '{{ pitch.name|escapejs }}')" class="button is-small is-link is-outlined">
-                                            Claim <i class="fas fa-hand-holding-hand ml-1"></i>
-                                        </button>
+                                    <div class="content mt-3">
+                                        <p>{{ pitch.description|truncatechars:150 }}</p>
+                                        
+                                        <div class="pitch-meta">
+                                            <span><i class="fas fa-bullhorn"></i> {{ pitch.mention_count }} mentions</span>
+                                            <span><i class="fas fa-gem has-text-danger"></i> Rank {{ pitch.rank }}</span>
+                                            <span><i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.get_clap_count }} claps</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
@@ -664,70 +721,61 @@
         </div>
     </div>
 
-    <!-- Claim Modal -->
-    <div class="modal p-4" id="claimModal">
-        <div class="modal-background" onclick="closeClaimModal()"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">Claim <span id="pitchName"></span></p>
-                <button class="delete" onclick="closeClaimModal()"></button>
-            </header>
-            <section class="modal-card-body">
-                <form method="post" action="{% url 'claim_pitch' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="pitch_id" id="pitchId">
-                    
-                    <div class="field">
-                        <label class="label">Verification Method</label>
-                        <div class="control">
-                            <label class="radio">
-                                <input type="radio" name="verification_method" value="email" checked>
-                                Email Verification
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="verification_method" value="x">
-                                X Account Verification
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="field">
-                        <label class="label">Your Role</label>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select name="role" required>
-                                    <option value="" disabled selected>Select your role</option>
-                                    <option value="founder">Founder</option>
-                                    <option value="ceo">CEO</option>
-                                    <option value="cto">CTO</option>
-                                    <option value="employee">Employee</option>
-                                    <option value="investor">Investor</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="field">
-                        <label class="label">Proof of Ownership (Optional)</label>
-                        <div class="control">
-                            <textarea class="textarea" name="proof" placeholder="Links to official profiles, documents, etc."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="field mt-5">
-                        <div class="control">
-                            <button type="submit" class="button is-primary is-fullwidth">
-                                Submit Claim
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </section>
-        </div>
-    </div>
-{% endblock  %}
 
+{% endblock  %}
+<!-- Claim Modal -->
+<div class="modal p-4" id="verifyModal">
+    <div class="modal-background" onclick="closeVerifyModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Verify <span id="pitchName"></span></p>
+            <button class="delete" onclick="closeVerifyModal()"></button>
+        </header>
+        <section class="modal-card-body">
+            <form method="post" action="{% url 'verify_claim' %}" id="verifyForm">
+                {% csrf_token %}
+                <input type="hidden" name="pitch_id" id="pitchId">
+                
+                <div class="field">
+                    <label class="label">Company Email Verification</label>
+                    <p class="help">We'll send you a verification code</p>
+                    <div class="control">
+                        <input type="email" name="company_email" class="input" required placeholder="e.g. your.email@productdomain.com must match your product domain">
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <label class="label">Your Role</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="role" required>
+                                <option value="" disabled selected>Select your role</option>
+                                <option value="founder">Founder</option>
+                                <option value="ceo">CEO</option>
+                                <option value="cto">CTO</option>
+                                <option value="employee">Employee</option>
+                                <option value="investor">Investor</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="field mt-5">
+                    <div class="control">
+                        <button type="submit" class="button is-warning is-fullwidth">
+                            Verify Pitch
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+<!-- Notification -->
+<div id="toast-notification" class="toast-notification has-background-warning has-text-black is-hidden">
+    Message?!
+</div>
 <!-- Footer -->
 <footer class="footer py-5">
     <div class="container">
@@ -737,9 +785,21 @@
     </div>
 </footer>
 
+<script>
+  // Utility functions
+  const toast_notification = document.querySelector("#toast-notification");
+  const showHide = (elem) => elem.classList.toggle('is-hidden');
+  const showMessage = (message) => {
+    toast_notification.textContent = message;
+    showHide(toast_notification);
+  };
+  // Toast click handler
+  toast_notification.addEventListener('click', function() {
+    showHide(this);
+  });
+</script>
 
 <script>
-
     // Message handling
     const cancel = document.querySelector('#cancel');
     const messageContainer = document.querySelector('.messages');
@@ -774,14 +834,15 @@
     });
 
     // Modal functions
-    function openClaimModal(pitchId, pitchName) {
+    function openVerifyModal(pitchId, pitchName) {
+        console.log(pitchId, pitchName);
         document.getElementById('pitchId').value = pitchId;
         document.getElementById('pitchName').textContent = pitchName;
-        document.getElementById('claimModal').classList.add('is-active');
+        document.getElementById('verifyModal').classList.add('is-active');
     }
     
-    function closeClaimModal() {
-        document.getElementById('claimModal').classList.remove('is-active');
+    function closeVerifyModal() {
+        document.getElementById('verifyModal').classList.remove('is-active');
     }
     
     function openOnboardingModal() {
@@ -791,6 +852,49 @@
     function closeOnboardingModal() {
         document.getElementById('onboardingModal').classList.remove('is-active');
     }
+
+    document.getElementById('verifyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const pitchId = formData.get('pitch_id');
+        const verificationMethod = formData.get('verification_method');
+        const role = formData.get('role');
+        console.log(pitchId, verificationMethod, role);
+        
+        fetch('{% url "verify_claim" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                pitch_id: pitchId,
+                verification_method: verificationMethod,
+                role: role
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showMessage(data.message);
+            }
+            if (data.success) {
+                closeVerifyModal();
+                // Optionally, refresh or update the UI to show the claimed pitch
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred while claiming the pitch.');
+        });
+    });
+</script>
+
+<script>
+    
+
+
 </script>
 
 </body>

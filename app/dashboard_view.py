@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count, Sum, Avg
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.utils import timezone
 from datetime import datetime, timedelta
+import json
 from .models import Pitch, Category, PitchAnalytics, UserProfile, Claim
 
 @login_required
@@ -21,18 +23,18 @@ def dashboard(request):
     
     # Get user-specific statistics
     user_stats = get_user_stats(request.user)
+    # new_pitches = Pitch.objects.filter().order_by('-created_at')[:4]
     
     # Get suggested pitches (based on X handle mentions)
-    suggested_pitches = []
     if profile.x_handle:
-        print(profile.x_handle)
+        # print(profile.x_handle)
         # Get all pitches that might contain the user's handle (case-insensitive)
         potential_pitches = Pitch.objects.filter(
             pitch_data__icontains=profile.x_handle
         ).exclude(
             claims__user=user
         ).order_by('-rank')[:10]  # Get a few more in case some don't match exactly
-        print(potential_pitches)
+        # print(potential_pitches)
 
         # Filter pitches where the handle is in the user.handle field of pitch_data
         suggested_pitches = [
@@ -45,13 +47,13 @@ def dashboard(request):
             )
         ]
     
-    claimed_pitches =Pitch.objects.filter(claims__user=user).order_by('-rank')
+    claimed_pitches = Claim.objects.filter(user=user).order_by('claimed_at')
     
     context = {
         'current_page': current_page,
         'user_stats': user_stats,
         'claimed_pitches': claimed_pitches,
-        'suggested_pitches': Pitch.objects.all()[:4],
+        'suggested_pitches': suggested_pitches,
         'user': user,
     }
     
@@ -142,11 +144,9 @@ def onboard_user(request):
 def claim_pitch(request):
     current_page = 'claim'
     context = {'current_page': current_page}
-    if request.method == 'POST':
-        product_url = request.POST.get('product_url')
-        name = request.POST.get('name')
-
-        if product_url and name:
+    if request.method == 'GET':
+        name = request.GET.get('name')
+        if name:
             claimable_pitches = Pitch.objects.filter(name__icontains=name)
             
             print(claimable_pitches.count())
@@ -162,10 +162,55 @@ def claim_pitch(request):
 
 # Fetch api function
 @login_required
-def add_claim(request):
+def verify_claim(request):
     if request.method == 'POST':
-        pitch_id = request.POST.get('pitch_id')
-        pitch = Pitch.objects.get(id=pitch_id)
-        claim = Claim.objects.create(user=request.user, pitch=pitch, status=Claim.PENDING)
-        messages.success(request, "Pitch claimed successfully!")
-        return JsonResponse({'success': True})
+        data = json.loads(request.body)
+        pitch_id = data.get('pitch_id')
+        role = data.get('role')
+        verification_method = data.get('verification_method')
+
+        if not all([pitch_id, role, verification_method]):
+            return JsonResponse({'success': False, 'message': 'Missing required fields.'}, status=400)
+
+        try:
+            pitch = Pitch.objects.get(id=pitch_id)
+            claim, created = Claim.objects.get_or_create(
+                user=request.user, 
+                pitch=pitch, 
+                defaults={'status': Claim.PENDING, 'role': role, 'verification_method': verification_method}
+            )
+
+            if not created:
+                return JsonResponse({'success': False, 'message': 'You have already submitted a claim for this pitch.'})
+            
+            return JsonResponse({'success': True, 'message': 'Pitch claimed successfully! We will review your claim.'})
+        except Pitch.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Pitch not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'An error occurred: {str(e)}'}, status=500)
+
+@login_required
+@require_POST
+def quick_claim(request):
+    try:
+        data = json.loads(request.body)
+        pitch_id = data.get('pitch_id')
+
+        if not pitch_id:
+            return JsonResponse({'success': False, 'message': 'Pitch ID is required.'}, status=400)
+
+        pitch = get_object_or_404(Pitch, id=pitch_id)
+
+        claim, created = Claim.objects.get_or_create(
+            user=request.user,
+            pitch=pitch,
+            defaults={'status': Claim.PENDING}
+        )
+
+        if not created:
+            return JsonResponse({'success': False, 'message': 'You have already submitted a claim for this pitch.'})
+
+        return JsonResponse({'success': True, 'message': 'Claim submitted! It is now pending verification.'})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)

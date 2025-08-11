@@ -1,0 +1,198 @@
+{% extends "../dashboard.html" %}
+{% load static %}
+{% block content %}
+<style>
+  footer { display: none; }
+
+  .tweet-card {
+    border: 1px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #fff;
+    font-family: system-ui, sans-serif;
+    max-width: 500px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .hook-item {
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 0.75em;
+    border: 1px solid #ddd;
+    transition: background 0.2s ease-in-out;
+  }
+  .hook-item:hover {
+    background: #f5f8fa;
+  }
+  .hook-item.is-selected {
+    background: #e8f5fd;
+    border-color: #1da1f2;
+  }
+
+  .tweet-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .coming-soon-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 1000;
+    flex-direction: column;
+    padding: 2rem;
+  }
+
+  .coming-soon-overlay p {
+    max-width: 600px;
+  }
+
+  .coming-soon-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 1000;
+    flex-direction: column;
+    padding: 2rem;
+  }
+
+  .coming-soon-overlay p {
+    max-width: 600px;
+  }
+</style>
+
+<section class="section p-5 has-background-white">
+  <div class="container">
+    <h1 class="title is-size-5">Tweet Ideas Generator</h1>
+
+    <div class="columns is-variable is-6">
+      <!-- Left: Input -->
+      <div class="column is-5">
+        <form id="tweet-form">
+          {% csrf_token %}
+
+          <!-- Product -->
+          <div class="field">
+            <label class="label">Product/Tool</label>
+            <div class="select is-fullwidth">
+              <select id="pitch_id" required>
+                <option value="" disabled selected>Select a product/tool…</option>
+                {% for pitch in new_pitches %}
+                  <option value="{{ pitch.id }}">{{ pitch.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Extra Ideas -->
+          <div class="field">
+            <label class="label">Extra Instructions</label>
+            <textarea id="extra_ideas" class="textarea" placeholder="E.g. Make them witty, use emojis, target marketers..."></textarea>
+          </div>
+
+          <!-- Generate Hooks -->
+          <div class="field">
+            <button class="button is-link is-fullwidth" id="generate-hooks-btn">
+              <span class="icon"><i class="fas fa-lightbulb"></i></span>
+              <span>Generate Hooks</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Hooks List -->
+        <div id="hook-list" class="mt-4">
+          <p class="help">Generated tweet ideas will appear here...</p>
+        </div>
+      </div>
+
+      <!-- Right: Tweet Preview -->
+      <div class="column is-7">
+        <div class="tweet-preview-header mb-3">
+          <h2 class="subtitle">Tweet Preview</h2>
+          <button class="button is-small" id="copy-tweet-btn">
+            <span class="icon"><i class="far fa-copy"></i></span>
+            <span>Copy Tweet</span>
+          </button>
+        </div>
+        <div id="tweet-preview">
+          <em>Select a hook to preview your tweet...</em>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="coming-soon-overlay has-background-warning">
+  <div>
+    <h2 class="title is-2 has-text-black">Coming Soon!</h2>
+    <p class="subtitle is-4 has-text-black-ter">
+      This new Tweet Hook tool helps builders share their products on X to get more reach and visibility.
+    </p>
+  </div>
+</div>
+{% comment %} 
+<script>
+  const hookList = document.getElementById('hook-list');
+  const tweetPreview = document.getElementById('tweet-preview');
+
+  document.getElementById('generate-hooks-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const pitch_id = document.getElementById('pitch_id').value;
+    const extra = document.getElementById('extra_ideas').value;
+
+    if (!pitch_id) return alert("Please select a product/tool");
+
+    hookList.innerHTML = '<p>Loading hooks...</p>';
+
+    const res = await fetch("{% url 'generate_tweet_hooks' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({ pitch_id, extra_ideas: extra })
+    });
+    const data = await res.json();
+
+    if (data.hooks) {
+      hookList.innerHTML = '';
+      data.hooks.forEach(hook => {
+        const div = document.createElement('div');
+        div.className = 'hook-item mb-2';
+        div.textContent = hook;
+        div.onclick = () => selectHook(div);
+        hookList.appendChild(div);
+      });
+    } else {
+      hookList.innerHTML = '<p class="has-text-danger">Error generating hooks</p>';
+    }
+  });
+
+  document.getElementById('copy-tweet-btn').addEventListener('click', async () => {
+    const text = tweetPreview.innerText;
+    if (!text || text.includes("Select a hook")) return alert("No tweet to copy");
+    await navigator.clipboard.writeText(text);
+    alert("Tweet copied to clipboard!");
+  });
+</script> 
+{% endcomment %}
+{% endblock %}

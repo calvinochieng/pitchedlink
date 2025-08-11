@@ -1,32 +1,32 @@
 {% extends "../dashboard.html" %}
 {% load static %}
 {% block content %}
-
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<!-- Quill JS -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<!-- Turndown JS for HTML to Markdown conversion -->
+<script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+<!-- Quill CSS -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<style>
+  .ql-toolbar.ql-snow {
+    border-left: 0;
+    border-right: 0;
+  }
+</style>
 
 <style>
   footer {
     display: none;
   }
-
-  input[type="radio"]:checked + .media {
-    border: 2px solid #3273dc;
-    border-radius: 6px;
-    padding: 0.5em;
+  .column{
+    height: calc(100vh - 100px);
   }
 
-  .custom-radio-label {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+  .right-column {
+    padding-left: 0;
   }
 
-  label.custom-radio-label:has(input[type="radio"]:checked) {
-    background-color: #ffd83cbf;
-    border-color: #ffd83c;
-  }
-
+  /* Form container styling */
   .floater-container {
     width: 100%;
   }
@@ -34,16 +34,23 @@
   .floater-container form {
     border: 1px solid #ccc;
     border-radius: 6px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    height: calc(100vh - 9rem);
+    overflow-y: auto;
   }
 
+  /* Preview area styling */
   .left-scroller {
     max-height: calc(100vh - 100px);
+    height: calc(100vh - 12rem);
     overflow-y: auto;
-    padding-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
+  /* Toast notification styling */
   .toast-notification {
     position: fixed;
     bottom: 20px;
@@ -57,16 +64,45 @@
     animation: slideIn 0.3s ease-out;
   }
 
-  #preview-card {
+  .preview-card {
     background-color: transparent !important;
-    border: 1px solid #ccc;
-    padding: 1rem;
     border-radius: 6px;
+    min-height: 200px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+    
+
+  /* Title item styling */
+  .title-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    margin-bottom: 0;
+    padding: .25em;
+    font-weight: normal !important;
+  
+  }
+  .title-item .subtitle {
+    font-weight: normal !important;
   }
 
+  .title-item:hover {
+    text-decoration: underline;
+    background-color: rgba(238, 246, 252, 0.89);
+  }
+
+  .title-item.is-selected {
+    background-color:rgba(238, 246, 252, 0.89);
+    border: 1px solid rgba(50, 115, 220, 0.55);
+    text-decoration: underline;
+  }
+
+  /* Toast animation */
   @keyframes slideIn {
     from {
-      transform: translateX(-50%) translateY(-10px);
+      transform: translateX(-50%) translateY(10px);
       opacity: 0;
     }
     to {
@@ -74,37 +110,101 @@
       opacity: 1;
     }
   }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+  }
+  /* Minimal styling for article action buttons */
+  .article-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin: 0.2em;
+    border-radius: 4px;
+    background: #fafbfc;
+    color: #222;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+    font-size: 1em;
+    text-decoration: none;
+    margin-right: 0.5em;
+  }
+  .action-buttons {
+    border-top: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+  }
+  .article-action-btn .icon {
+    font-size: 1.1em;
+  }
+  
+  .article-action-btn:hover {
+    color: #ffd83c;
+  }
+  #clearBtn {
+    position: absolute;
+    right: 1rem;
+  }
+  #clearBtn:hover {
+    color: #ff0000 !important;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  
+  /* Responsive styles for mobile */
+  @media screen and (max-width: 768px) {
+    .column {
+      height: auto; /* Remove fixed height on mobile */
+    }
+    .right-column {
+      padding-left: 0.75rem; /* Restore default padding on mobile */
+    }
+    .floater-container form {
+      height: auto !important;
+    }
+  }
 </style>
 
-<section class="section p-5">
+<section class="section p-5 has-background-white">
   <div class="container">
+    <h1 class="title is-size-5" >SEO Writer</h1>
     <div class="columns is-variable is-8">
       
       <!-- LEFT: Form -->
-      <div class="column is-half">
-        <h1 class="title has-text-centered">📝 SEO Article Writer</h1>
+      <div class="column is-5">
         <div class="floater-container">
-          <form id="article-form" method="post">
+          <form id="article-form" class="" method="post">
             {% csrf_token %}
 
             <!-- Product Selection -->
             <div class="field">
               <label class="label" for="pitch_id">Your Product/Tool</label>
-              <p class="help">Select the product/tool you want to write about</p>
+              <p class="help">Select the product/tool you wish to write about</p>
               <div class="control">
                 <div class="select is-fullwidth">
                   <select name="pitch_id" id="pitch_id" required>
                     <option value="" disabled selected>Select a product/tool…</option>
-                    {% for pitch in claimed_pitches %}
+                    {% for pitch in new_pitches %}
                       <option value="{{ pitch.id }}">{{ pitch.name }}</option>
                     {% endfor %}
                   </select>
                 </div>
               </div>
             </div>
-
-            <input type="hidden" name="tweet_content" id="tweet_content">  
-            <input type="hidden" name="tweet_url" id="tweet_url">  
 
             <!-- Extra Ideas -->
             <div class="field">
@@ -115,45 +215,66 @@
                   id="extra_ideas" 
                   class="textarea" 
                   rows="3"
-                  placeholder="E.g. highlight a free trial, explain how it solves X, tone, etc."></textarea>
+                  placeholder="E.g. Please write an SEO article about the benefits of using this product/tool."></textarea>
               </div>
             </div>
 
             <!-- Submit -->
             <div class="field mt-5">
               <div class="control">
-                <button type="submit" class="button is-warning is-fullwidth" id="generate-btn">
+                <button class="button is-link" id="generate-title-btn">
+                  <span class="icon"><i class="fas fa-magic"></i></span>
+                  <span>Get Titles</span>
+                </button>
+                <button class="button is-warning" id="generate-btn">
                   <span class="icon"><i class="fas fa-magic"></i></span>
                   <span>Write Article</span>
                 </button>
               </div>
+            </div>        
+          
+            <div id="title-options" class="mt-5">
+              <h2 class="subtitle">Title List</h2>
+              <div id="title-list">
+                <p class="help"> Generated titles will appear here...</p>
+              </div>
             </div>
-          </form>
+          </form> 
         </div>
       </div>
 
       <!-- RIGHT: Output Preview -->
-      <div class="column is-half">
-        <h2 class="subtitle">🧾 Article Preview</h2>
-        <div class="left-scroller">
+      <div class="column is-7 right-column">         
+        <div class="buttons pb-2 pt-2 mb-0 action-buttons">
+          <span class="article-action-btn" id="copy-article-btn">
+            <span class="icon"><i class="far fa-copy"></i></span>
+            <span>Copy</span>
+          </span>
+          <span class="article-action-btn" id="export-article-btn">
+            <span class="icon"><i class="far fa-file-alt"></i></span>
+            <span>Export (.txt)</span>
+          </span>
+          <span class="article-action-btn" id="export-md-btn">
+            <span class="icon"><i class="fab fa-markdown"></i></span>
+            <span>Export (.md)</span>
+          </span>
+          {% comment %} <span class="article-action-btn" id="save-article-btn" data-save-article>
+            <span class="icon"><i class="far fa-save"></i></span>
+            <span>Save</span>
+          </span>
+          <span class="article-action-btn" id="publish-article-btn" data-publish-article>
+            <span class="icon"><i class="far fa-save"></i></span>
+            <span>Publish</span>
+          </span> {% endcomment %}
           
-          <div class="buttons mt-4">
-            <button class="button is-link" id="copy-article-btn">
-              <span class="icon"><i class="far fa-copy"></i></span>
-              <span>Copy</span>
-            </button>
-            <button class="button is-link" id="export-article-btn">
-              <span class="icon"><i class="far fa-file"></i></span>
-              <span>Export (.txt)</span>
-            </button>
-            <button class="button is-link" id="save-article-btn" data-save-article="">
-              <span class="icon"><i class="far fa-save"></i></span>
-              <span>Save</span>
-            </button>
-          </div>
-
-          <div id="preview-card" class="card-content mt-3" contenteditable="true" style="white-space: pre-wrap;">
-            <em>Generated article will appear here...</em>
+          <span class="article-action-btn" id="clearBtn">
+            <span>Clear</span>
+            <span class="icon"><i class="far fa-trash-alt"></i></span>
+          </span>
+        </div>
+        <div class="left-scroller"> 
+          <div id="editor" class="preview-card">
+            <em>Generated article from the selected title will appear here...</em>
           </div>
         </div>
       </div>
@@ -161,10 +282,249 @@
     </div>
   </div>
 </section>
+<!-- Quill JS -->
+<script>
+  // Initialize Quill editor
+   const quill = new Quill('#editor', {
+     theme: 'snow'
+   });
+   // Assuming `quill` is your Quill editor instance
+   quill.on('text-change', function() {
+     // Get updated HTML or plain text from preview
+     const updatedContent = quill.root.innerHTML;
+ 
+     // Find the currently selected title element
+     const selectedTitle = document.querySelector('.title-item.is-selected'); // adjust selector
+ 
+     if (selectedTitle) {
+         selectedTitle.dataset.article = updatedContent; 
+         // OR selectedTitle.setAttribute('data-content', updatedContent);
+     }
+   });
+ 
+ 
+  </script>
+ 
 
-<!-- Notification -->
-<div id="toast-notification" class="toast-notification has-background-warning has-text-black" style="display:none;">
-  Article copied!
-</div>
+<script>
+  // Title generation
+  const titleButton = document.getElementById('generate-title-btn');
+  const titleList = document.getElementById('title-list');
+
+  titleButton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const pitch_id = document.getElementById('pitch_id').value;
+    const ideas = document.getElementById('extra_ideas').value;
+
+    if (!pitch_id) {
+      showMessage('Please select a product/tool first!');
+      return;
+    }
+
+    titleButton.classList.add('is-loading');
+    titleButton.disabled = true;
+
+    try {
+      if (!pitch_id) {
+        showMessage("Please select a product/tool first!");
+        return;
+      }
+      const response = await fetch('{% url "generate_titles" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({pitch_id: pitch_id, extra_ideas: ideas})
+      });
+
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      const data = await response.json();
+      
+      if (data.error) {
+        showMessage('Error: ' + data.error);
+        return;
+      }
+
+      if (!Array.isArray(data.titles)) {
+        showMessage('Unexpected response from server.');
+        return;
+      }
+
+      titleList.innerHTML = '';
+      data.titles.forEach((item, index) => {
+        const titleItem = document.createElement('div');
+        titleItem.className = 'title-item mb-3';
+        titleItem.innerHTML = `
+          <h2 class="subtitle mb-1 has-text-weight-bold">${item.title}</h2>
+
+        `;
+        titleItem.setAttribute('data-content', JSON.stringify(item));
+        titleItem.setAttribute('data-article', '');
+        titleItem.addEventListener('click', function() {
+          document.querySelectorAll('.title-item').forEach(item => item.classList.remove('is-selected'));
+          this.classList.add('is-selected');
+          document.querySelector(".ql-editor").focus();
+          // On mobile, scroll to the editor view
+          {% comment %} if (window.innerWidth <= 768) { {% endcomment %}
+            document.querySelector('.right-column').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          {% comment %} } {% endcomment %}
+          const articleContent = this.getAttribute('data-article').trim();
+
+          if (articleContent === '') {
+            // First click: Populate from data-content and save to data-article
+            const data_content = JSON.parse(this.getAttribute('data-content'));
+            const title = data_content.title.trim();
+            const description = data_content.description.trim();
+
+            quill.setContents([
+              { insert: title + '\n', attributes: { header: 1 } },
+              { insert: description + '\n' }
+            ]);
+
+            this.setAttribute('data-article', quill.root.innerHTML);
+          } else {
+            // Subsequent clicks: Populate from the stored data-article content
+            quill.root.innerHTML = articleContent;
+          }
+        });
+        titleList.appendChild(titleItem);
+      });
+    } catch (err) {
+      showMessage('Failed to fetch titles: ' + err.message);
+    } finally {
+      titleButton.classList.remove('is-loading');
+      titleButton.disabled = false;
+    }
+  });
+
+  // Article generation
+  document.getElementById("article-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const pitch_id = document.getElementById("pitch_id").value;
+    const extraIdeas = document.getElementById("extra_ideas").value;
+    const selectedTitleElem = document.querySelector(".title-item.is-selected");
+
+    if (!pitch_id) {
+      showMessage("Please select a product/tool first!");
+      return;
+    }
+
+    if (!selectedTitleElem) {
+      showMessage("Please select a title first!");
+      return;
+    }
+
+    const contentData = JSON.parse(selectedTitleElem.getAttribute('data-content'));
+    const generateBtn = document.getElementById('generate-btn');
+    generateBtn.classList.add('is-loading');
+    generateBtn.disabled = true;
+
+    try {
+      // Validate required fields before making the fetch call
+      if (!pitch_id || !contentData.title || !contentData.description) {
+        showMessage("Some fields are not filled");
+        return;
+      }
+      const response = await fetch("{% url 'generate_article' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+        },
+        body: JSON.stringify({
+          pitch_id: pitch_id,
+          title: contentData.title,
+          description: contentData.description,
+          extra_ideas: extraIdeas,
+        }),
+      });
+
+      const data = await response.json();
+      const preview = document.getElementById("editor");
+
+      if (response.ok) {
+        preview.textContent = data.content;
+      } else {
+        preview.textContent = "⚠️ Error generating article: " + data.error;
+      }
+    } catch (error) {
+      document.getElementById("editor").textContent = "⚠️ Network error: " + error.message;
+    } finally {
+      generateBtn.classList.remove('is-loading');
+      generateBtn.disabled = false;
+    }
+  });
+
+  // Copy functionality for rich text
+  document.getElementById("copy-article-btn").addEventListener("click", async () => {
+    try {
+      const htmlContent = quill.root.innerHTML;
+      const textContent = quill.getText();
+
+      // Create a Blob with the HTML content
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      
+      // Create a ClipboardItem with both HTML and plain text versions
+      const clipboardItem = new ClipboardItem({
+        'text/html': blob,
+        'text/plain': new Blob([textContent], { type: 'text/plain' })
+      });
+
+      // Write the ClipboardItem to the clipboard
+      await navigator.clipboard.write([clipboardItem]);
+      
+      showMessage("Copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy rich text: ", err);
+      // Fallback for older browsers or if the above fails
+      try {
+        const textContent = quill.getText();
+        await navigator.clipboard.writeText(textContent);
+        showMessage("Copied as plain text!");
+      } catch (fallbackErr) {
+        showMessage("Failed to copy: " + fallbackErr.message);
+      }
+    }
+  });
+
+  // Export as Markdown functionality
+  document.getElementById("export-md-btn").addEventListener("click", () => {
+    const turndownService = new TurndownService();
+    const markdown = turndownService.turndown(quill.root.innerHTML);
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "article.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // Export functionality
+  document.getElementById("export-article-btn").addEventListener("click", () => {
+    const text = document.getElementById("editor").textContent;
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "article.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  
+  // Clear functionality
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('editor').querySelector('.ql-editor').innerHTML = '<em>Generated article from the selected title will appear here...</em>';
+    document.getElementById('title-list').innerHTML = '<p class="help"> Generated titles will appear here...</p>';
+  });
+</script>
+
 
 {% endblock %}

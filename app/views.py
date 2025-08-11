@@ -321,7 +321,7 @@ def detail(request, slug):
     
     # SEO metadata
     meta_data = {
-        'title': f"{pitch.name} - Discover & Track Startup Pitches | PitchedLink",
+        'title': f"{pitch.name} | PitchedLink",
         'description': pitch.description[:160] if pitch.description else f"Discover {pitch.name}, a trending startup pitch on PitchedLink. View details, rankings, and engagement metrics.",
         'keywords': f"{pitch.name}, startup pitch, {pitch.category or 'software'}, trending startups, pitch deck",
         'canonical_url': request.build_absolute_uri(),
@@ -383,28 +383,23 @@ def detail(request, slug):
 @require_http_methods(["POST"])
 @login_required
 def clap_pitch(request, slug):
-    """
-    Handle AJAX requests to clap for a pitch
-    """
     try:
+        data = json.loads(request.body)
+        clap_count = max(1, int(data.get('clap_count', 1)))
+
         pitch = get_object_or_404(Pitch, slug=slug)
-        
-        # Increment clap count
-        pitch.clap += 1
-        pitch.save()  # This will also recalculate the rank
-        
+        pitch.add_clap(user=request.user, clap_count=clap_count)
+
+        # 👉 Show raw claps in UI — feels better
+        display_claps = pitch.get_clap_count()
+
         return JsonResponse({
             'success': True,
-            'new_count': pitch.clap,
-            'new_rank': pitch.rank
+            'display_claps': display_claps,  # 👈 Big number for UI
+            'rank': pitch.rank               # 👈 Real rank (based on effective claps)
         })
-        
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=400)
-
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 def pricing(request):
     return render(request, 'pricing.html')

@@ -1,58 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta Information -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock title %} PitchedLink</title>
-    {% load static %}
 
-    <!-- SEO Meta Tags -->
-    <link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
+<!-- Meta Information -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ meta_data.title|default:'PitchedLink | Discover & Rank Early-Stage SaaS Pitches' }}{% endblock %}</title>
+{% load static %}
 
-    <meta name="description" content="{% block description %}{% endblock description %}">
-    <meta name="keywords" content="">
-    <meta name="author" content="Calvin Ochieng">
+<!-- SEO Meta Tags -->
+<link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
 
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@calvinochieng_">
-    <meta name="twitter:image:alt" content="PitchedLink">
+<meta name="description" content="{{ meta_data.description|default:'Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.' }}">
+<meta name="keywords" content="SaaS, startup, pitch, microstartup, indie hacker, product launch, tech, innovation">
+<meta name="author" content="Calvin Ochieng">
 
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pitchedl.ink">
+<meta property="og:title" content="{{ meta_data.title|default:'PitchedLink | Discover & Rank Early-Stage SaaS Pitches' }}">
+<meta property="og:description" content="{{ meta_data.description|default:'Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.' }}">
+<meta property="og:image" content="https://pitchedl.ink{% static 'pitchedlink-og.png' %}">
+<meta property="og:image:alt" content="PitchedLink | Discover & Rank Early-Stage SaaS Pitches">
+<meta property="og:site_name" content="PitchedLink">
+<meta property="og:locale" content="en_US">
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https:/pitchedl.ink">
-    <meta property="og:image:alt" content="PitchedLink">
-    <meta property="og:site_name" content="PitchedLink">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:logo" content=" {% static 'logo.png'%} " />
-        
+<!-- Twitter Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@calvinochieng_">
+<meta name="twitter:title" content="{{ meta_data.title|default:'PitchedLink | Discover & Rank Early-Stage SaaS Pitches' }}">
+<meta name="twitter:description" content="{{ meta_data.description|default:'Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.' }}">
+<meta name="twitter:image" content="https://pitchedl.ink{% static 'pitchedlink-og.png' %}">
+<meta name="twitter:image:alt" content="PitchedLink | Discover & Rank Early-Stage SaaS Pitches">
 
-    
-    {% block meta %} {% endblock meta %}
-
-    <!-- Schema.org (JSON-LD for Rich Results) -->
-    <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "website",
-          "name": "PitchedLink",
-          "author": {
-            "@type": "Person",
-            "name": "Calvin Ochieng"
-          },
-          "description": "",
-          "image": "{% static 'app/images/logo.png' %}",
-          "url": "https:/pitchedl.ink",
-          "publisher": {
-            "@type": "Organization",
-            "name": "Microsaas Link"
-          },
-          "inLanguage": "en",
-          "datePublished": "2025-2-10"
-        }
-    </script>
+<!-- Schema.org (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "PitchedLink",
+  "url": "https://pitchedl.ink",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://pitchedl.ink/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Calvin Ochieng"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PitchedLink",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://pitchedl.ink{% static 'logo.png' %}"
+    }
+  },
+  "description": "Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.",
+  "inLanguage": "en-US",
+  "datePublished": "2025-08-11"
+}
+</script>
         
 
     <!-- Fonts -->
@@ -137,14 +146,23 @@
         }
     </style>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
+   <!-- Google Consent Mode & GA4 -->
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-2N03YDH7HF');
-    </script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+    
+        // Default: deny all
+        gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+        });
+    
+        gtag('js', new Date());
+        gtag('config', 'G-2N03YDH7HF', { 'send_page_view': false });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
 </head>
 <body>
      <!-- Navigation Bar -->
@@ -163,8 +181,8 @@
       </div>
       <div id="navbarBasic" class="navbar-menu">
         <div class="navbar-end">
-          <a class="navbar-item" href="/#features">Features</a>
-          <a class="navbar-item" href="/#how-it-works">How It Works</a>
+          <a class="navbar-item" href="{% url 'home' %}#features">Features</a>
+          <a class="navbar-item" href="{% url 'home' %}#how-it-works">How It Works</a>
           <div class="navbar-item">
             <div class="buttons">
               <a class="button is-black is-rounded" href="{% url 'account_signup' %}">
@@ -234,6 +252,7 @@
                         <li><a href="https://microsaasl.ink/" target="_blank" rel="noopener" class="has-text-light">Microsaaslink</a></li>
                         <li><a href="https://yourstartuppitches.onrender.com/" target="_blank" rel="noopener" class="has-text-light">YourStartupPitches</a></li>
                         <li><a href="https://xtuls.com/" target="_blank" rel="noopener" class="has-text-light">Xtuls</a></li>
+                        <li><a href="https://pitchedl.ink/" target="_blank" rel="noopener" class="has-text-light">PitchedLink</a></li>
                     </ul>
                 </div>
                 
@@ -364,6 +383,7 @@
         if (cancel){ cancel.addEventListener('click', removeMessage);}
     </script>
     
+    <script src="{% static 'app/js/gdpr-consent.js' %}"></script>
     {% block scripts %}{% endblock scripts %}
         
 </body>

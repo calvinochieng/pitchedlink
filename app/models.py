@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 from bs4 import BeautifulSoup
 from .utils.ranking_system import calculate_rank
+import random
 
 from django.core.exceptions import ValidationError
 import re
@@ -81,21 +82,44 @@ class Pitch(models.Model):
     claimed = models.BooleanField(default=False)
     rank = models.IntegerField(default=1)
     
-    def add_clap(self, user):
-        """Add a clap from a user to this pitch"""
+
+    def add_clap(self, user, clap_count=1):
+        """
+        Add multiple claps from a user (e.g. from debounced frontend),
+        but enforce max 10 total claps per user per pitch.
+
+        Args:
+            user: Authenticated user
+            clap_count (int): Number of claps user attempted (e.g. 30)
+
+        Returns:
+            int: New total effective clap count for the pitch
+        """
+        if not user.is_authenticated:
+            return self.clap  # No change
+
+        # Get or create the user's clap record for this pitch
         clap, created = Clap.objects.get_or_create(
             user=user,
             pitch=self,
-            defaults={'count': 1}
+            defaults={'count': 0}  # Start at 0, then add below
         )
-        
-        if not created:
-            # If user already clapped, increment their clap count
-            clap.add_clap()
-        
-        # Update the total effective claps
+
+        # Determine new total claps after adding
+        new_total = clap.count + clap_count
+
+        # Enforce max of 10
+        final_count = min(new_total, 10)
+
+        # Only update if there's a change
+        if final_count > clap.count:
+            clap.count = final_count
+            clap.save(update_fields=['count', 'last_clapped'])
+
+        # Recalculate effective clap total for the pitch
         self.clap = self.get_effective_clap_count()
-        self.save(update_fields=['clap'])
+        self.save()
+
         return self.clap
     
     def get_clap_count(self):
@@ -242,72 +266,7 @@ class Pitch(models.Model):
             reverse=True
         )
         return sorted_pitches[0] if sorted_pitches else None
-    
-    # def rank_setter(self):
-    #     """
-    #     Calculate the ranking score using ALL engagement metrics from pitch_data,
-    #     the number of claps, and claimed status.
-    #     """
-    #     # Calculate total engagement from all social media mentions
-    #     total_engagement = self.get_engagement_data()
-        
-    #     # Update the stored total_engagement field
-    #     self.total_engagement = total_engagement
-    #     self.mention_count = len(self.pitch_data) if self.pitch_data else 0
-        
-    #     # Calculate rank using total engagement
-    #     score = calculate_rank(
-    #         engagement_data=total_engagement,
-    #         claps=self.clap,
-    #         claimed=self.claimed
-    #     )
-    #     self.rank = score
-        
-    # def get_engagement_score(self):
-    #     """Get a simple engagement score for display"""
-    #     if not self.total_engagement:
-    #         return 0
-        
-    #     total = self.total_engagement
-    #     return (total.get('likes', 0) + 
-    #             total.get('retweets', 0) * 2 + 
-    #             total.get('replies', 0) * 3)
-
-    # def save(self, *args, **kwargs):
-    #     # Update rank and engagement totals
-    #     self.rank_setter()
-        
-    #     # Generate slug if not exists
-    #     if not self.slug and self.name:
-    #         self.slug = slugify(self.name)
-    #         original_slug = self.slug
-    #         num = 1
-    #         while Pitch.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-    #             self.slug = f"{original_slug}-{num}"
-    #             num += 1
-        
-    #     # Ensure we have a name
-    #     if not self.name:
-    #         self.name = "Untitled Pitch"
-        
-    #     return None# super().save(*args, **kwargs)
-
-    # def __str__(self):
-    #     return f"{self.name} ({self.category.name if self.category else 'Uncategorized'})"
-    
-    # def get_latest_mention(self):
-        """Get the most recent social media mention"""
-        if not self.pitch_data:
-            return None
-        
-        # Sort by timestamp and return the latest
-        sorted_pitches = sorted(
-            self.pitch_data, 
-            key=lambda x: x.get('timestamp', {}).get('datetime', ''), 
-            reverse=True
-        )
-        return sorted_pitches[0] if sorted_pitches else None   
-    
+   
     
 class PitchAnalytics(models.Model):
     """Store analytics and tracking data for pitches"""
@@ -339,7 +298,7 @@ class PitchAnalytics(models.Model):
         return f"Analytics for {self.pitch.name}"
 
 
-# models.py
+# User Profile
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     x_handle = models.CharField(max_length=50, blank=True, null=True)
@@ -350,49 +309,44 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - @{self.x_handle}"
 
+# Clap Model
 class Clap(models.Model):
-    """
-    Tracks individual claps from users on pitches with the following logic:
-    - 1st clap = 1 clap
-    - Next 5 claps = 1 clap (total 2 claps after 6 claps)
-    - Next 4 claps = 1 clap (total 3 claps after 10 claps)
-    - Further claps don't increment the count
-    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='claps')
     pitch = models.ForeignKey('Pitch', on_delete=models.CASCADE, related_name='user_claps')
-    count = models.PositiveIntegerField(default=1)
+    count = models.PositiveIntegerField(default=1)  # Starts at 1
     last_clapped = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'pitch')
         ordering = ['-last_clapped']
-        indexes = [
-            models.Index(fields=['pitch', 'user']),
-            models.Index(fields=['pitch', '-last_clapped']),
-        ]
+
+    def add_clap(self):
+        """Increment clap count, up to a maximum of 10"""
+        if self.count >= 10:
+            return False  # Max reached
+        self.count += 1
+        self.save(update_fields=['count', 'last_clapped'])
+        return True
+
+    def get_effective_claps(self):
+        """
+        Returns effective claps contributed by this user:
+        - 1-5 claps → 1
+        - 6-9 claps → 2
+        - 10 claps → 3
+        - Max = 3
+        """
+        if self.count >= 10:
+            return 3
+        elif self.count >= 6:
+            return 2
+        elif self.count >= 1:
+            return 1
+        return 0
 
     def __str__(self):
         return f"{self.user.username} clapped {self.count} times on {self.pitch.name}"
-
-
-
-    def get_effective_claps(self):
-        """Calculate the effective number of claps based on the clapping rules"""
-        if self.count <= 1:
-            return self.count
-        elif self.count <= 6:  # 1 (first) + 5 = 6 claps
-            return 2
-        elif self.count <= 10:  # 6 (previous) + 4 = 10 claps
-            return 3
-        return 3  # Max 3 claps per user per pitch
-
-    def add_clap(self):
-        """Increment the clap count if allowed"""
-        if self.count < 10:  # Only increment if under the max
-            self.count += 1
-            self.save()
-        return self.count
 
 
 class Claim(models.Model):
@@ -404,11 +358,36 @@ class Claim(models.Model):
         (VERIFIED, 'Verified'),
         (REJECTED, 'Rejected'),
     ]
+    ROLE_CHOICES = [
+        ('ceo', 'CEO'),
+        ('cto', 'CTO'),
+        ('founder', 'Founder'),
+        ('employee', 'Employee'),
+        ('investor', 'Investor'),
+        ('other', 'Other'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='claims')
     pitch = models.ForeignKey(Pitch, on_delete=models.CASCADE, related_name='claims')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=VERIFIED)
+    
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='other')
+    company_mail = models.EmailField(null=True, blank=True)
+    verification_method = models.CharField(max_length=50, blank=True, null=True)
+    verification_code = models.CharField(max_length=8, blank=True, null=True)
     claimed_at = models.DateTimeField(auto_now_add=True)
-    verified_at = models.DateTimeField(auto_now=True)
+    verified_at = models.DateTimeField(auto_now=True) 
+
+    def save(self, *args, **kwargs):
+        if not self.verification_code:
+            self.verification_code = str(random.randint(10000000, 99999999))
+        super().save(*args, **kwargs)
+
+    def verify(self, code):
+        if str(code) == self.verification_code:
+            self.status = self.VERIFIED
+            self.save()
+            return True
+        return False
 
     def __str__(self):
         return f"{self.user.username}'s claim on {self.pitch.name}"
@@ -521,3 +500,6 @@ class GeneratedTweet(models.Model):
 
     def __str__(self):
         return f"{self.author.username} - {self.pitch.name}: Tweet - {self.content}"
+
+
+

@@ -245,7 +245,7 @@
                         <span class="icon">
                             <i class="fa-solid fa-hands-clapping has-text-success"></i>
                         </span>
-                        <span class="clap-count">{{ pitch.clap|default:0 }}</span>
+                        <span class="clap-count">{{ pitch.get_clap_count|default:0 }}</span>
                     </button>
                 </span>
                 <span onclick="window.open('{{ pitch.url }}', '_blank');" class="is-clickable"><i class="fa-solid fa-external-link-alt has-text-link"></i></span>

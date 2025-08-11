@@ -45,7 +45,7 @@
           {% endfor %}
         {% endif %}
 
-        <form method="post" class="box has-background-white">
+        <form method="get" class="box has-background-white">
           {% csrf_token %}
 
           <div class="field">
@@ -54,14 +54,7 @@
               <input class="input" type="text" name="name" placeholder="e.g. My Product" required>
             </div>
           </div>
-
-          <div class="field">
-            <label class="label">SaaS Product/ Startup/ Tool URL</label>
-            <div class="control">
-              <input class="input" type="url" name="product_url" placeholder="https://yourproduct.com" required>
-            </div>
-          </div>
-
+          
           <div class="field is-grouped is-grouped-centered mt-5">
             <div class="control">
               <button type="submit" class="button is-medium is-rounded">
@@ -80,12 +73,15 @@
         
         {% if claimable_pitches %}
             {% for pitch in claimable_pitches %}
-              <div class="card pitch-card p-3">
+              <div class="card pitch-card p-3 mb-3">
                 <div class="card-content p-3">
                     <div class="media">
                         <div class="media-left">
-                            {% if pitch.icon_url %}
-                            <img src="{{ pitch.icon_url }}" alt="{{ pitch.name }}" class="image is-48x48">
+                            {% if pitch.icon_url %}                            
+                            <img src="{{ pitch.icon_url|default:'/static/icon.png' }}" 
+                              alt="{{ pitch.name }}" 
+                              class="image is-48x48"
+                              onerror="this.src='{% static 'icon.png' %}'">
                             {% else %}
                             <div class="image is-48x48 has-background-light has-text-centered pt-2">
                                 <i class="fas fa-rocket has-text-primary"></i>
@@ -107,8 +103,8 @@
                         </div>
                     </div>
                 </div>
-                <button class="button is-link">
-                  Claim <span class="ml-1 icon"><i class="fas fa-hand-holding-hand"></i></span>
+                <button onclick="claimPitch({{ pitch.id }}, this)" class="button is-small is-warning is-outlined">
+                  Quick Claim <i class="fas fa-bolt ml-1"></i>
                 </button>
               </div>
             {% endfor %}
@@ -123,7 +119,32 @@
     </div>
   </div>
 </section>
-<script>
 
+<script>
+function claimPitch(pitchId, button) {
+    fetch(`{% url 'quick_claim' %}`,
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ pitch_id: pitchId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showMessage(data.message);
+        if (data.success) {
+            button.disabled = true;
+            button.textContent = 'Claimed';
+            button.classList.remove('is-warning');
+            button.classList.add('is-success');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('An error occurred while claiming the pitch.');
+    });
+}
 </script>
 {% endblock %}

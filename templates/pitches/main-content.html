@@ -809,7 +809,7 @@
                               <span class="icon">
                                   <i class="fas fa-hands-clapping has-text-success"></i>
                               </span>
-                              <span>{{ pitch.clap }} Claps</span>
+                              <span>{{ pitch.get_clap_count }} Claps</span>
                               </span>
                           </div>
                           </div>
@@ -1151,7 +1151,7 @@
           const handle = pitch.handle || '';
           const category = pitch.category || 'Startup';
           const rank = pitch.rank || '';
-          const clap = pitch.clap || 0;
+          const clap = pitch.get_clap_count || 0;
           const mention_count = pitch.mention_count || 0;
           const title = escapeHtml(pitch.title || pitch.name || '');
           const pitchUrl = pitch.url ? escapeHtml(pitch.url) : '#';
@@ -1216,7 +1216,7 @@
           }
       }, 100);
   });
-  </script>
+</script>
 
 
 

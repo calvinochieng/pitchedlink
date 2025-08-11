@@ -2,7 +2,21 @@
 
 
 {% block title %}Leaderboard | PitchedLink{% endblock %}
+
+{% block description %}Track and rank SaaS products shared in "Pitch your startup" threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!{% endblock description %}
+
 {% load static %}
+{% block meta %}
+    <!-- meta seo -->
+    <meta property="og:title" content="Discover the Hottest SaaS Pitches">
+    <meta property="og:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
+    <meta property="og:image" content="{% static 'pitchedlink-og.png' %}">
+    
+    <meta name="twitter:title" content="Discover the Hottest SaaS Pitches">
+    <meta name="twitter:description" content="Automatically curated SaaS pitches ranked by real social engagement. Claim your pitch and boost your visibility—no submissions required.">
+    <meta name="twitter:image" content="{% static 'pitchedlink-og.png' %}"> 
+{% endblock meta %}
+
 {% block custom_styles %}
  <style>
    .right-sidebar{

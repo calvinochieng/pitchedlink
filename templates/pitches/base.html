@@ -1,55 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta Information -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock title %} PitchedLink</title>
-    {% load static %}
+<!-- Meta Information -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ meta_data.title|default:'PitchedLink' }}{% endblock %}</title>
+{% load static %}
 
-    <!-- SEO Meta Tags -->
-    <link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
+<!-- SEO Meta Tags -->
+<link rel="icon" href="{% static 'logo.png' %}" type="image/x-icon">
 
-    <meta name="description" content="{% block description %}{% endblock description %}">
-    <meta name="keywords" content="">
-    <meta name="author" content="Calvin Ochieng">
+<meta name="description" content="{{ meta_data.description|default:'Track and rank SaaS products shared in \'Pitch your startup\' threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!' }}">
+<meta name="keywords" content="SaaS, startup, pitch, microstartup, indie hacker, product launch, tech, innovation">
+<meta name="author" content="Calvin Ochieng">
 
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@calvinochieng_">
-    <meta name="twitter:image:alt" content="PitchedLink">
+<!-- Open Graph Meta Tags -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pitchedl.ink">
+<meta property="og:title" content="{{ meta_data.title|default:'PitchedLink' }}">
+<meta property="og:description" content="{{ meta_data.description|default:'Track and rank SaaS products shared in \'Pitch your startup\' threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!' }}">
+<meta property="og:image" content="https://pitchedl.ink{% static 'pitchedlink-og.png' %}">
+<meta property="og:image:alt" content="PitchedLink">
+<meta property="og:site_name" content="PitchedLink">
+<meta property="og:locale" content="en_US">
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://pitchedl.ink">
-    <meta property="og:image:alt" content="PitchedLink">
-    <meta property="og:site_name" content="PitchedLink">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:logo" content=" {% static 'logo.png'%} " />
+<!-- Twitter Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@calvinochieng_">
+<meta name="twitter:title" content="{{ meta_data.title|default:'PitchedLink' }}">
+<meta name="twitter:description" content="{{ meta_data.description|default:'Track and rank SaaS products shared in \'Pitch your startup\' threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!' }}">
+<meta name="twitter:image" content="https://pitchedl.ink{% static 'pitchedlink-og.png' %}">
+<meta name="twitter:image:alt" content="PitchedLink">
 
-    {% block meta %} {% endblock meta %}
+<!-- Schema.org (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "PitchedLink",
+  "url": "https://pitchedl.ink",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://pitchedl.ink/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Calvin Ochieng"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "PitchedLink",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://pitchedl.ink{% static 'logo.png' %}"
+    }
+  },
+  "description": "Track and rank SaaS products shared in \'Pitch your startup\' threads. Discover hidden gems and get your SaaS noticed. Claim your listing today!",
+  "inLanguage": "en-US",
+  "datePublished": "2025-08-11"
+}
+</script>
 
-    <!-- Schema.org (JSON-LD for Rich Results) -->
-    <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "website",
-          "name": "PitchedLink",
-          "author": {
-            "@type": "Person",
-            "name": "Calvin Ochieng"
-          },
-          "description": "",
-          "image": "{% static 'app/images/PitchedLink.png' %}",
-          "url": "https:/yourpitchesl.ink",
-          "publisher": {
-            "@type": "Organization",
-            "name": "Microsaas Link"
-          },
-          "inLanguage": "en",
-          "datePublished": "2025-2-10"
-        }
-    </script>
+{% block meta %}{% endblock %}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -200,14 +213,23 @@
    
     </style>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
+     
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
     
-      gtag('config', 'G-2N03YDH7HF');
+        // Default: deny all
+        gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+        });
+    
+        gtag('js', new Date());
+        gtag('config', 'G-2N03YDH7HF', { 'send_page_view': false });
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N03YDH7HF"></script>
 </head>
 <body style="background-color: var(--background-color); color: var(--text-color);">
   
@@ -363,107 +385,7 @@
             });
         });
     </script>
-
-    <!-- Universal Clap Functionality -->
-    <script>
-        // Global clap function
-        async function clapPitch(button) {
-            const slug = button.dataset.slug;
-            const clapCountElement = button.querySelector('.clap-count');
-            const rankElement = document.querySelector(`.pitch-rank[data-slug="${slug}"]`);
-            
-            if (!slug) {
-                console.error('No slug found for clap button');
-                return;
-            }
-
-            try {
-                // Add loading state
-                button.classList.add('is-loading');
-                button.disabled = true;
-                
-                const response = await fetch(`/clap_pitch/${slug}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'same-origin'
-                });
-
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Update clap count
-                    if (clapCountElement) {
-                        clapCountElement.textContent = data.new_count;
-                        // Add animation
-                        clapCountElement.classList.add('has-text-success');
-                        setTimeout(() => clapCountElement.classList.remove('has-text-success'), 1000);
-                    }
-                    
-                    // Update rank if element exists
-                    if (rankElement) {
-                        rankElement.textContent = data.new_rank;
-                        rankElement.classList.add('has-text-weight-bold');
-                        setTimeout(() => rankElement.classList.remove('has-text-weight-bold'), 1000);
-                    }
-                    
-                    // Visual feedback
-                    const icon = button.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('fa-hands-clapping');
-                        icon.classList.add('fa-check');
-                        setTimeout(() => {
-                            icon.classList.remove('fa-check');
-                            icon.classList.add('fa-hands-clapping');
-                        }, 1000);
-                    }
-                } else {
-                    throw new Error(data.error || 'Failed to clap');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Show error feedback
-                button.classList.add('has-text-danger');
-                setTimeout(() => button.classList.remove('has-text-danger'), 2000);
-            } finally {
-                button.classList.remove('is-loading');
-                button.disabled = false;
-            }
-        }
-
-        // Helper function to get CSRF token
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // Initialize clap buttons on page load and for dynamically added content
-        document.addEventListener('DOMContentLoaded', function() {
-            // Event delegation for dynamically added buttons
-            document.body.addEventListener('click', function(e) {
-                const clapButton = e.target.closest('.clap-button');
-                if (clapButton) {
-                    e.preventDefault();
-                    clapPitch(clapButton);
-                }
-            });
-        });
-    </script>
-    
+    <script src="{% static 'app/js/gdpr-consent.js' %}"></script>
     {% block scripts %}{% endblock scripts %}
 </body>
 </html>

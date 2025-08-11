@@ -895,7 +895,7 @@
                     <i class="fas fa-external-link-alt has-text-link"></i>
                   </a>
                   <a href="{% url 'detail' slug=pitch.slug %}" class="stat">
-                    <i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.clap|default:0 }}
+                    <i class="fas fa-hands-clapping has-text-success"></i> {{ pitch.get_clap_count|default:0 }}
                   </a>
                   <span class="stat">
                     <i class="fas fa-bullhorn has-text-warning"></i> {{ pitch.mention_count }}
@@ -1318,7 +1318,7 @@
                             <i class="fas fa-external-link-alt has-text-link"></i>
                         </a>
                         <a href="/p/${pitch.slug}/" class="stat">
-                            <i class="fas fa-hands-clapping has-text-success"></i> ${pitch.clap || 0}
+                            <i class="fas fa-hands-clapping has-text-success"></i> ${pitch.get_clap_count || 0}
                         </a>
                         <span class="stat">
                             <i class="fas fa-bullhorn has-text-warning"></i> ${pitch.mentions || 0}

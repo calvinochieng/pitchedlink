@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 
-DEBUG = True or config('DEBUG',  cast=bool)
+DEBUG = config('DEBUG',  cast=bool)
 LOCAL = True
 
 PRODUCTION_MODE = config('PRODUCTION_MODE',cast=bool)
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 ]
 SITE_ID = 1
 
-ALLOWED_HOSTS = ["127.0.0.1", "pitchedlink.onrender.com","pitchedl.ink"]
+ALLOWED_HOSTS = ["127.0.0.1", "www.pitchedl.ink","pitchedl.ink"]
 
 
 # CORS Configuration AND API Configuration
@@ -58,6 +58,8 @@ ALLOWED_HOSTS = ["127.0.0.1", "pitchedlink.onrender.com","pitchedl.ink"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:9000",  # React
     "http://127.0.0.1:9000",
+    "https://pitchedl.ink",
+    "https://www.pitchedl.ink",
     # Add your frontend URLs
 ]
 
