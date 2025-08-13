@@ -26,6 +26,7 @@ def dashboard(request):
     # new_pitches = Pitch.objects.filter().order_by('-created_at')[:4]
     
     # Get suggested pitches (based on X handle mentions)
+    suggested_pitches = []
     if profile.x_handle:
         # print(profile.x_handle)
         # Get all pitches that might contain the user's handle (case-insensitive)
